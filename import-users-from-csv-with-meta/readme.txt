@@ -4,7 +4,7 @@ Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter, meta data, meta, user, users, user meta,  editor, profile, custom, fields, delimiter, update, insert, automatically, cron
 Requires at least: 3.4
 Tested up to: 6.4.2
-Stable tag: 1.24.8
+Stable tag: 1.25
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,6 +107,9 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.25 =
+*   You can now use multiple user download buttons on the front end. Each with its own options.
 
 = 1.24.8 =
 *   Changed the way charsets are converted

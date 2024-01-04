@@ -520,7 +520,7 @@ class ACUI_Frontend{
         ACUI_Exporter::styles();
 		?>
         
-		<form method="POST" class="acui_frontend_form" id="acui_exporter">
+		<form method="POST" class="acui_frontend_form acui_exporter">
             <input type="hidden" name="acui_frontend_export" value="1"/>
         
             <?php foreach( $atts as $key => $value ): ?>
