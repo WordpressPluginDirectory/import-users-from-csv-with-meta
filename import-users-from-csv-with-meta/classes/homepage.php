@@ -56,6 +56,10 @@ class ACUI_Homepage{
 		<div class="row">
 			<div class="main_bar">
 				<form method="POST" id="acui_form" enctype="multipart/form-data" action="" accept-charset="utf-8">
+
+				<input class="button-primary" type="submit" name="uploadfile" id="uploadfile_btn_up" value="<?php _e( 'Start importing', 'import-users-from-csv-with-meta' ); ?>"/>
+				<input class="button-primary" type="submit" name="save_options" value="<?php _e( 'Save options without importing', 'import-users-from-csv-with-meta' ); ?>"/>
+
 				<h2 id="acui_file_header"><?php _e( 'File', 'import-users-from-csv-with-meta'); ?></h2>
 				<table  id="acui_file_wrapper" class="form-table">
 					<tbody>
@@ -267,7 +271,7 @@ class ACUI_Homepage{
 				<?php wp_nonce_field( 'codection-security', 'security' ); ?>
 
 				<input class="button-primary" type="submit" name="uploadfile" id="uploadfile_btn" value="<?php _e( 'Start importing', 'import-users-from-csv-with-meta' ); ?>"/>
-				<input class="button-primary" type="submit" name="save_options" id="save_options" value="<?php _e( 'Save options without importing', 'import-users-from-csv-with-meta' ); ?>"/>
+				<input class="button-primary" type="submit" name="save_options" value="<?php _e( 'Save options without importing', 'import-users-from-csv-with-meta' ); ?>"/>
 				</form>
 			</div>
 
@@ -363,7 +367,7 @@ class ACUI_Homepage{
 	jQuery( document ).ready( function( $ ){
 		check_delete_users_checked();
 
-        $( '#uploadfile_btn' ).click( function(){
+        $( '#uploadfile_btn,#uploadfile_btn_up' ).click( function(){
             if( $( '#uploadfile' ).val() == "" && $( '#upload_file' ).is( ':visible' ) ) {
                 alert("<?php _e( 'Please choose a file', 'import-users-from-csv-with-meta' ); ?>");
                 return false;
