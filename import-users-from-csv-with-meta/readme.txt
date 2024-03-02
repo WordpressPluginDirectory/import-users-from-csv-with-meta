@@ -3,8 +3,8 @@ Contributors: carazo, hornero
 Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter, meta data, meta, user, users, user meta,  editor, profile, custom, fields, delimiter, update, insert, automatically, cron
 Requires at least: 3.4
-Tested up to: 6.4.2
-Stable tag: 1.25.1
+Tested up to: 6.4.3
+Stable tag: 1.26
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,7 +36,7 @@ Moreover this plugin is compatible with many other plugins to be able to import 
 *	WooCommerce Subscriptions: to create subscriptions associated with users while they are being imported
 *	BuddyPress: to import custom BuddyPress avatars, fields, groups and roles
 *   Advanced Custom Fields: to import data to the fields you define there
-*	Paid Membership Pro: to import memberships
+*	Paid Membership Pro: to import memberships, included compatibility with PMPro version 3
 *	Indeed Ultimate Membership Pro: to import memberships
 *   Paid Member Subscriptions: to import memberships
 *	Allow Multiple Accounts: plugin will allow the same rules importing than this plugin
@@ -107,6 +107,13 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.26 =
+*   Included compatibility with version 3 of Paid Membership Pro
+*   Included a new filter to filter a specific data in the export: acui_export_data_$key where $key is the specific value of the column for that value.
+
+= 1.25.2 =
+*   Including a conditional check to prevent WooCommerce from being declared active if it is not active because it has been forcefully deactivated 
 
 = 1.25.1 =
 *   On the home page, for importing users we now show the buttons to start the process or save the settings at the top, to facilitate cases where the same options are used repeatedly

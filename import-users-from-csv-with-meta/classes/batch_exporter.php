@@ -620,6 +620,9 @@ class ACUI_Batch_Exporter{
 				'filtered_columns' => $this->get_filtered_columns() 
 			) );
 
+			foreach( $row as $key => $value )
+				$row[ $key ] = apply_filters( 'acui_export_data_' . $key, $value );
+
             $this->row_data[] = array_values( $row );
 		}
 	}

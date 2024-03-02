@@ -151,8 +151,8 @@ class ACUI_Buddypress{
 
 	function export_data( $row, $user, $args ){
 		$fields_to_export = ( count( $args['filtered_columns'] ) == 0 ) ? $this->fields : array_intersect( $this->fields, $args['filtered_columns'] );
-		
-        foreach( $fields_to_export as $key ) {
+
+		foreach( $fields_to_export as $key ) {
 			$row[ $key ] = xprofile_get_field_data( $key, $user, 'comma' );
 		}
 
