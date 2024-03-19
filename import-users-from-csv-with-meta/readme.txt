@@ -3,8 +3,8 @@ Contributors: carazo, hornero
 Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter, meta data, meta, user, users, user meta,  editor, profile, custom, fields, delimiter, update, insert, automatically, cron
 Requires at least: 3.4
-Tested up to: 6.4.3
-Stable tag: 1.26
+Tested up to: 6.5
+Stable tag: 1.26.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ Clean and easy-to-use import and export users and customer plugin, for WordPress
 *	Import thousends of users or customers in only some seconds
 *   Export users or customers to a CSV file, filtering by role or registered date
 *	You can also import meta-data like data from WooCommerce customers
-*	You can assign roles while importing
+*	You can assign roles while importing. To create new user roles or manage existing ones we recommend you using [Profile Builder - Roles Editor](https://wordpress.org/plugins/profile-builder/)
 *	Send a mail to every new user, this mails can be saved as templates and are fully customizable, before sending you can test it
 *	Use your own 
 *	You can also update users if the user is already in your WordPress
@@ -54,17 +54,26 @@ If you have some problem or doubt:
 *	Read our documentation
 *	Ask anything in support forum, we try to give the best support
 
-In Codection we have more plugins, please take a look to them.
+In Codection we have more plugins, please take a look to them. 
 
 *	[RedSys Gateway for WooCommerce Pro a plugin to connect your WooCommerce to RedSys](https://codection.com/producto/redsys-gateway-for-woocommerce) (premium)
 *	[Ceca Gateway for WooCommerce Pro a plugin to connect your WooCommerce to Ceca](https://codection.com/producto/ceca-gateway-for-woocommerce-pro/) (premium)
-*	[RedSys Button for WordPress a plugin to receive payments using RedSys in WordPress without using WooCommerce](https://codection.com/producto/redsys-button-wordpress/) (premium)
+
 *	[RedSys Gateway for Contact Form 7 a plugin to receive payments using RedSys in WordPress using the popular contact plugin Contact Form 7](https://codection.com/producto/redsys-gateway-for-contact-form-7/) (premium)
 *	[Ceca Gateway for Contact Form 7 a plugin to receive payments using Ceca in WordPress using the popular contact plugin Contact Form 7](https://codection.com/producto/ceca-gateway-for-contact-form-7/) (premium)
+*	[RedSys & Bizum Gateway for Gravity Forms a plugin to receive payments using RedSys in Gravity Forms](https://codection.com/plugin/redsys-bizum-gateway-for-gravity-forms/) (premium)
+*	[RedSys & Bizum Gateway for WPForms a plugin to receive payments using RedSys WP Forms](https://codection.com/plugin/redsys-gateway-for-wpforms/) (premium)
+
+*	[RedSys & Bizum for GiveWP a plugin to receive payments using RedSys in Give WP the most popular donation plugin and fundraising platform for WordPress](https://codection.com/plugin/redsys-bizum-for-givewp/) (premium)
+
+*	[RedSys Link Generator a plugin to receive payments using payment links like PayGold but better](https://codection.com/plugin/redsys-link-generator/) (premium)
+*	[RedSys & Bizum Gateway for EDD Pro a plugin to receive payments using RedSys with Easy Digital Downloads](https://codection.com/plugin/redsys-gateway-for-edd-pro/) (premium)
+
 *	[RedSys Gateway for WP Booking Calendar Pro a plugin to receive payments using RedSys in WordPress using WP Booking Calendar Pro](https://codection.com/producto/redsys-gateway-for-wp-booking-calendar-pro/) (premium)
-*	[RedSys Gateway for Goodlayers Tourmaster Pro a plugin to receive payments using RedSys in WordPress using Goodlayers Tourmaster Pro](https://codection.com/producto/redsys-gateway-for-goodlayers-tourmaster-pro/) (premium)
+
 *	[Clean Login a plugin to create your own register, log in, lost password and update profile forms](https://wordpress.org/plugins/clean-login/) (free)
 *   [Products Restricted Users for WooCommerce a plugin to restrict product visibility by user](https://wordpress.org/plugins/woo-products-restricted-users/) (free)
+
 *   [First payment date for WooCommerce Subscriptions a plugin to set a first payment date in membership sites with WooCommerce Subscriptions](https://wordpress.org/plugins/first-payment-date-for-woocommerce-subscriptions/) (free)
 *   [Payment Schedule for WooCommerce Subscriptions](https://import-wp.com/payment-schedule-for-woocommerce-subscriptions) (premium)
 
@@ -107,6 +116,9 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.26.1 =
+*   Ready for WordPress 6.5
 
 = 1.26 =
 *   Included compatibility with version 3 of Paid Membership Pro
