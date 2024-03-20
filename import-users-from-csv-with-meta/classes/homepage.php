@@ -98,7 +98,8 @@ class ACUI_Homepage{
 							foreach ( ACUI_Helper::get_editable_roles() as $key => $value )
 							ACUIHTML()->checkbox( array( 'label' => translate_user_role( $value ), 'name' => 'role[]', 'compare_value' => $settings->get( 'role' ), 'current' => $key, 'array' => true, 'class' => 'roles' ) );
 						?>
-						<p class="description"><?php _e( sprintf( 'You can also import roles from a CSV column. Please read documentation tab to see how it can be done. If you choose more than one role, the roles would be assigned correctly but you should use <a href="https://wordpress.org/plugins/profile-builder/">Profile Builder - Roles Editor</a> to manage them. <a href="%s">Click to Install & Activate</a>', esc_url( network_admin_url('plugin-install.php?tab=plugin-information&plugin=profile-builder' ) ) ), 'import-users-from-csv-with-meta' ); ?></p>
+						<p class="description"><?php _e( sprintf( 'You can also import roles from a CSV column. Please read documentation tab to see how it can be done. If you choose more than one role, the roles would be assigned correctly but you should use <a href="https://wordpress.org/plugins/profile-builder/">Profile Builder - Roles Editor</a> to manage them. <a href="%s">Click to Install & Activate</a>', esc_url( wp_nonce_url( self_admin_url('update.php?action=install-plugin&plugin=profile-builder'), 'install-plugin_profile-builder') ) ), 'import-users-from-csv-with-meta' ); ?></p>
+						
 						</td>
 					</tr>
 

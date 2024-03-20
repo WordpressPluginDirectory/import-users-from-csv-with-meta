@@ -300,7 +300,7 @@ class ACUI_Import{
             $data[$i] = ACUIHelper()->string_conversion( $data[$i] );
 
             if( is_serialized( $data[$i] ) ) // serialized
-                $data[$i] = maybe_unserialize( $data[$i] );
+                $data[$i] = @unserialize( trim( $data[$i] ), array( 'allowed_classes' => false ) );
             elseif( strpos( $data[$i], "::" ) !== false ) // list of items
                 $data[$i] = ACUI_Helper::get_array_from_cell( $data[$i] );                                              
         }

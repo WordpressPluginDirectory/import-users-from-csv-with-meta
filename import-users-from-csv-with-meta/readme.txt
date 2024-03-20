@@ -1,10 +1,10 @@
 === Import and export users and customers ===
 Contributors: carazo, hornero
 Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
-Tags: csv, import, export, importer, exporter, meta data, meta, user, users, user meta,  editor, profile, custom, fields, delimiter, update, insert, automatically, cron
+Tags: csv, import, export, importer, exporter
 Requires at least: 3.4
 Tested up to: 6.5
-Stable tag: 1.26.2
+Stable tag: 1.26.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -116,6 +116,12 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.26.3 =
+*   We now use unserialize with the allowed_classes flag set to false instead of maybe_unserialize to avoid any possibility of PHP code execution from CSV
+
+= 1.26.2 =
+*   Improved usability with some links
 
 = 1.26.1 =
 *   Ready for WordPress 6.5
