@@ -127,6 +127,7 @@ class ACUI_Buddypress{
 					<li><?php echo $buddypress_field; ?> - <?php echo $type . $this->get_type_import_help( $type ); ?></li>
 					<?php endforeach; ?>
 				</ul>
+				<?php _e( 'The visibility options of each field when importing will be the default ones defined by BuddyPress/BuddyBoss.', 'import-users-from-csv-with-meta' ); ?>
 			</td>
 		</tr>
 		<tr valign="top">

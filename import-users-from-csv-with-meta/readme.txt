@@ -4,7 +4,7 @@ Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter
 Requires at least: 3.4
 Tested up to: 6.5
-Stable tag: 1.26.4
+Stable tag: 1.26.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -116,6 +116,10 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.26.5 =
+*   New hooks added to improve extensibility with emails
+*   Improved documentation in the BuddyPress/BuddyBoss addon
 
 = 1.26.4 =
 *   Improved the BuddyPress/BuddyBoss addon to include a mechanism to facilitate the calculation of the visibility of user fields that have been imported new
