@@ -876,6 +876,7 @@ class ACUI_Import{
 
         if( $is_backend && $settings['change_role_not_present'] == 'yes' ){
             $change_role_not_present_flag = true;
+            $change_role_not_present_role = $settings['change_role_not_present_role'];
         }
 
         if( $is_cron && !empty( get_option( "acui_cron_change_role_not_present" ) ) ){

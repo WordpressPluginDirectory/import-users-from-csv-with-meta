@@ -4,11 +4,11 @@ Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter
 Requires at least: 3.4
 Tested up to: 6.5
-Stable tag: 1.26.5
+Stable tag: 1.26.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Import and export users and customers using CSV files including custom user meta and roles. Integrations with lots of other plugins. Frontend upload, cron import and much more.
+Import and export users and customers including user meta, roles, and other. Compatible with many plugins. Do it from the front end or using cron.
 
 == Description ==
 
@@ -116,6 +116,13 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.26.6.1 =
+*   Readme updated
+
+= 1.26.6 =
+*   Fixed a problem changing roles of users not present in current CSV using standard import
+*   Included new checks
 
 = 1.26.5 =
 *   New hooks added to improve extensibility with emails
