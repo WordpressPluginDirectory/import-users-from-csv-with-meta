@@ -3,8 +3,8 @@ Contributors: carazo, hornero
 Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter
 Requires at least: 3.4
-Tested up to: 6.5
-Stable tag: 1.26.6.1
+Tested up to: 6.5.2
+Stable tag: 1.26.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -116,6 +116,9 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.26.7 =
+*   Included new sanitization checks
 
 = 1.26.6.1 =
 *   Readme updated
@@ -1617,6 +1620,10 @@ You can get:
 
 = Customizations, addons, develops... =
 [Write us directly to contacto@codection.com](mailto:contacto@codection.com).
+
+= How can I report security bugs? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/import-users-from-csv-with-meta)
 
 == Installation ==
 
