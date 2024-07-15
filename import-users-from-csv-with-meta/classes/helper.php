@@ -250,6 +250,9 @@ class ACUI_Helper{
     static function get_attachment_id_by_url( $url ) {
         $wp_upload_dir = wp_upload_dir();
         $dir = set_url_scheme( trailingslashit( $wp_upload_dir['baseurl'] ), 'relative' );
+
+        if( !is_string( $url ) )
+            return false;
     
         if ( false !== strpos( $url, $dir ) ) {    
             $file = basename( $url );

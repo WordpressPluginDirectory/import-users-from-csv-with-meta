@@ -397,12 +397,9 @@ class ACUI_Frontend{
             else{
                 do_action( 'acui_pre_frontend_import' );
 
-                $file = array_keys( $_FILES );
-                $csv_file_id = $this->upload_file( $file[0] );
-
                 // start
                 $form_data = array();
-                $form_data["path_to_file"] = get_attached_file( $csv_file_id );
+                $form_data["path_to_file"] = sanitize_text_field( $_FILES['uploadfile']['tmp_name'] );
 
                 // emails
                 $form_data["sends_email"] = get_option( "acui_frontend_send_mail" );
@@ -430,8 +427,6 @@ class ACUI_Frontend{
                 
                 $acui_import = new ACUI_Import();
                 $acui_import->fileupload_process( $form_data, false, true );
-
-                wp_delete_attachment( $csv_file_id, true );
 
                 do_action( 'acui_post_frontend_import' );
             }
@@ -463,17 +458,6 @@ class ACUI_Frontend{
 		
 		<?php
 		return ob_get_clean();
-	}
-
-	function upload_file( $file_handler ) {
-	    if ( $_FILES[$file_handler]['error'] !== UPLOAD_ERR_OK ) {
-	        __return_false();
-	    }
-	    require_once( ABSPATH . "wp-admin" . '/includes/image.php' );
-	    require_once( ABSPATH . "wp-admin" . '/includes/file.php' );
-	    require_once( ABSPATH . "wp-admin" . '/includes/media.php' );
-	    $attach_id = media_handle_upload( $file_handler, 0 );
-	    return $attach_id;
 	}
 
 	function sanitize_shortcode_values( $key, $value ){

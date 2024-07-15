@@ -236,19 +236,13 @@ class ACUI_Import{
             wp_die( __( 'Nonce check failed', 'import-users-from-csv-with-meta' ) ); 
         }
 
-        if( empty( $_FILES['uploadfile']['name'] ) || $is_frontend ){
+        if( empty( $_FILES['uploadfile']['name'] ) ){
             $path_to_file = $this->manage_file_upload( $form_data["path_to_file"] );
 
             if( $path_to_file !== false )
-                $this->import_users( $path_to_file, $form_data, 0, $is_cron, $is_frontend );        
+                $this->import_users( $path_to_file, $form_data, $is_cron, $is_frontend );        
         }else{
-            $uploadfile = wp_handle_upload( $_FILES['uploadfile'], array( 'test_form' => false, 'mimes' => array('csv' => 'text/csv') ) );
-    
-            if ( !$uploadfile || isset( $uploadfile['error'] ) ) {
-                wp_die( __( 'Problem uploading file to import. Error details: ' . var_export( $uploadfile['error'], true ), 'import-users-from-csv-with-meta' ));
-            } else {
-                $this->import_users( $uploadfile['file'], $form_data, ACUI_Helper::get_attachment_id_by_url( $uploadfile['url'] ), $is_cron, $is_frontend );
-            }
+            $this->import_users( sanitize_text_field( $_FILES['uploadfile']['tmp_name'] ), $form_data, $is_cron, $is_frontend );
         }
     }
     
@@ -256,13 +250,12 @@ class ACUI_Import{
         $path_to_file = $this->manage_file_upload( $form_data["path_to_file"] );
 
         if( $path_to_file !== false )
-            $this->import_users( $path_to_file, $form_data, 0, true, false, $step, $initial_row, 29 );        
+            $this->import_users( $path_to_file, $form_data, true, false, $step, $initial_row, 29 );        
     }
 
     function read_first_row( $data, &$headers, &$positions, &$headers_filtered ){
         $data = apply_filters( 'pre_acui_import_header', $data );
 
-        // check min columns username - email
         if( count( $data ) < 2 ){
             echo "<div id='message' class='error'>" . __( 'File must contain at least 2 columns: username and email', 'import-users-from-csv-with-meta' ) . "</div>";
             return false;
@@ -725,7 +718,7 @@ class ACUI_Import{
         set_transient( 'acui_users_ignored', $users_ignored, HOUR_IN_SECONDS );
     }
 
-    function import_users( $file, $form_data, $attach_id = 0, $_is_cron = false, $_is_frontend = false, $step = 1, $initial_row = 0, $time_per_step = -1 ){
+    function import_users( $file, $form_data, $_is_cron = false, $_is_frontend = false, $step = 1, $initial_row = 0, $time_per_step = -1 ){
         $time_start = microtime( true );
 
         if( $time_per_step == -1 )
@@ -806,8 +799,6 @@ class ACUI_Import{
                 break;
             }
 
-            $this->prepare_array_of_data( $data );
-            
             if( $row == 1 ){
                 $columns = count( $data );
                 $result = $this->read_first_row( $data, $headers, $positions, $headers_filtered );
@@ -815,6 +806,8 @@ class ACUI_Import{
                     break;
             }
             else{
+                $this->prepare_array_of_data( $data );
+
                 if( count( $data ) != $columns ):
                     $errors[] = ACUIHelper()->new_error( $row, __( 'Row does not have the same columns than the header, we are going to ignore this row', 'import-users-from-csv-with-meta') );
                     continue;
@@ -855,9 +848,6 @@ class ACUI_Import{
         ACUIHelper()->print_errors( $errors );
 
         ACUIHelper()->maybe_enable_wordpress_core_emails();
-
-        if( $attach_id != 0 )
-            wp_delete_attachment( $attach_id );
 
         // delete all users that have not been imported
         $delete_users_flag = false;
