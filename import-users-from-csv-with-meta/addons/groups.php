@@ -27,7 +27,7 @@ class ACUI_Groups{
 				<ul style="list-style:disc outside none; margin-left:2em;">
 					<li><?php _e( "group_id as the column title", 'import-users-from-csv-with-meta' ); ?></li>
 					<li><?php _e( "The value of each cell will be the ID of the group that you want to assign to this user", 'import-users-from-csv-with-meta' ); ?></li>
-					<li><?php _e( "Another option is use group_name as the column title", 'import-users-from-csv-with-meta' ); ?></li>
+					<li><?php _e( "Another option is to use group_name as the column title", 'import-users-from-csv-with-meta' ); ?></li>
 					<li><?php _e( "The value of each cell will be the name of the group that you want to assign to this user", 'import-users-from-csv-with-meta' ); ?></li>
 					<li><?php _e( "If you want to import multiple values, you can use a list using commas to separate items", 'import-users-from-csv-with-meta' ); ?></li>
 				</ul>

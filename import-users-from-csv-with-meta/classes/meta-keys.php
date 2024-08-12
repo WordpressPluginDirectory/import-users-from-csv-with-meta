@@ -83,7 +83,7 @@ class ACUI_MetaKeys_Table extends WP_List_Table {
 	}
 
 	function no_items() {
-		_e( 'No meta keys availale.', 'sp' );
+		_e( 'No meta keys available.', 'sp' );
 	}
 
 	function column_default( $item, $column_name ) {

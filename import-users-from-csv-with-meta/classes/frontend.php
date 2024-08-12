@@ -1,5 +1,4 @@
 <?php
-
 if ( ! defined( 'ABSPATH' ) ) exit; 
 
 class ACUI_Frontend{
@@ -65,7 +64,7 @@ class ACUI_Frontend{
 
                 <tr class="form-field">
 					<th scope="row"><label for=""><?php _e( 'Attribute delete-only-specified-role', 'import-users-from-csv-with-meta' ); ?></label></th>
-					<td><?php _e( 'You can use this attribute to make delete only users of the specified role that are not present in the CSV, for example:', 'import-users-from-csv-with-meta' ); ?> <pre>[import-users role="editor" delete-only-specified-role="true"]</pre> <?php _e( 'will only delete (if the deletion is active) the users not present in the CSV with are editors', 'import-users-from-csv-with-meta' ); ?>
+					<td><?php _e( 'You can use this attribute to delete only users of the specified role that are not present in the CSV, for example:', 'import-users-from-csv-with-meta' ); ?> <pre>[import-users role="editor" delete-only-specified-role="true"]</pre> <?php _e( 'will only delete (if the deletion is active) the users not present in the CSV with are editors', 'import-users-from-csv-with-meta' ); ?>
 					</td>
 				</tr>
                 </tbody>
@@ -84,7 +83,7 @@ class ACUI_Frontend{
                             'show_option_all' => false,
                             'show_option_none' => __( 'Disable role assignment in frontend import', 'import-users-from-csv-with-meta' ),
                         )); ?>
-						<p class="description"><?php _e( 'Which role would be used to import users?', 'import-users-from-csv-with-meta' ); ?></p>
+						<p class="description"><?php _e( 'Which role will be used to import users?', 'import-users-from-csv-with-meta' ); ?></p>
 					</td>
 				</tr>
                 </tbody>
@@ -95,13 +94,13 @@ class ACUI_Frontend{
                 <tbody>
 
                 <tr id="acui_send_email_wrapper" class="form-field">
-					<th scope="row"><label for="user_login"><?php _e( 'Send mail', 'import-users-from-csv-with-meta' ); ?></label></th>
+					<th scope="row"><label for="user_login"><?php _e( 'Send email', 'import-users-from-csv-with-meta' ); ?></label></th>
 					<td>
 						<p id="sends_email_wrapper">
-                            <?php ACUIHTML()->checkbox( array( 'name' => 'send-mail-frontend', 'label' => __( 'Do you wish to send a mail with credentials and other data?', 'import-users-from-csv-with-meta' ), 'compare_value' => $send_mail_frontend ) ); ?>
+                            <?php ACUIHTML()->checkbox( array( 'name' => 'send-mail-frontend', 'label' => __( 'Do you wish to send an email with credentials and other data?', 'import-users-from-csv-with-meta' ), 'compare_value' => $send_mail_frontend ) ); ?>
 						</p>
 						<p id="send_email_updated_wrapper">
-                            <?php ACUIHTML()->checkbox( array( 'name' => 'send-mail-updated-frontend', 'label' => __( 'Do you wish to send this mail also to users that are being updated? (not only to the one which are being created)', 'import-users-from-csv-with-meta' ), 'compare_value' => $send_mail_updated_frontend ) ); ?>
+                            <?php ACUIHTML()->checkbox( array( 'name' => 'send-mail-updated-frontend', 'label' => __( 'Do you wish to send this mail also to users that are being updated? (not just to the one which are being created)', 'import-users-from-csv-with-meta' ), 'compare_value' => $send_mail_updated_frontend ) ); ?>
 						</p>
 					</td>
 				</tr>
@@ -110,7 +109,7 @@ class ACUI_Frontend{
 					<th scope="row"><label for=""><?php _e( 'Force users to reset their passwords?', 'import-users-from-csv-with-meta' ); ?></label></th>
 					<td>
                         <?php ACUIHTML()->checkbox( array( 'name' => 'force_user_reset_password', 'compare_value' => get_option( 'acui_frontend_force_user_reset_password' ) ) ); ?>
-                        <p class="description"><?php _e( 'If a password is set to an user and you activate this option, the user will be forced to reset their password in their first login', 'import-users-from-csv-with-meta' ); ?></p>
+                        <p class="description"><?php _e( 'If a password is set to a user and you activate this option, the user will be forced to reset their password at their first login', 'import-users-from-csv-with-meta' ); ?></p>
 					</td>
 				</tr>
 
@@ -150,7 +149,7 @@ class ACUI_Frontend{
 					<th scope="row"><label><?php _e( 'Update roles for existing users?', 'import-users-from-csv-with-meta' ); ?></label></th>
 					<td>
                         <?php ACUIHTML()->select( array(
-                            'options' => array( 'no' => __( 'No', 'import-users-from-csv-with-meta' ), 'yes_no_override' => __( 'Yes, add new roles and not override existing ones', 'import-users-from-csv-with-meta' ), 'yes' => __( 'Yes', 'import-users-from-csv-with-meta' ) ),
+                            'options' => array( 'no' => __( 'No', 'import-users-from-csv-with-meta' ), 'yes_no_override' => __( 'Yes, add new roles and do not override existing ones', 'import-users-from-csv-with-meta' ), 'yes' => __( 'Yes', 'import-users-from-csv-with-meta' ) ),
                             'name' => 'update_roles_existing_users',
                             'selected' => $update_roles_existing_users,
                             'show_option_all' => false,
@@ -179,7 +178,7 @@ class ACUI_Frontend{
                                 'show_option_all' => false,
                                 'show_option_none' => __( 'Delete posts of deleted users without assigning to any user', 'import-users-from-csv-with-meta' ),
                             )); ?>
-							<p class="description"><?php _e( 'After delete users, we can choose if we want to assign their posts to another user. Please do not delete them or posts will be deleted.', 'import-users-from-csv-with-meta' ); ?></p>
+							<p class="description"><?php _e( 'After deleting users, you can choose if you want to assign their posts to another user. Please do not delete them or posts will be deleted.', 'import-users-from-csv-with-meta' ); ?></p>
 						</div>
 					</td>
 				</tr>
@@ -198,7 +197,7 @@ class ACUI_Frontend{
                                 'show_option_all' => false,
                                 'show_option_none' => false,
                             )); ?>
-							<p class="description"><?php _e( 'After import users which is not present in the CSV and can be changed to a different role.', 'import-users-from-csv-with-meta' ); ?></p>
+							<p class="description"><?php _e( 'After importing users from a CSV, users not present in the CSV can have their roles changed to a different role.', 'import-users-from-csv-with-meta' ); ?></p>
 						</div>
 					</td>
 				</tr>
@@ -223,7 +222,7 @@ class ACUI_Frontend{
 
                 <tr class="form-field">
 					<th scope="row"><label for=""><?php _e( 'Attribute role', 'import-users-from-csv-with-meta' ); ?></label></th>
-					<td><?php _e( 'You can use role as attribute to choose directly in the shortcode the role to use during the export. Remind that you must use the role slug, for example:', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users role="editor"]</pre>
+					<td><?php _e( 'You can use role as attribute to choose directly in the shortcode the role to use during the export. Remember that you must use the role slug, for example:', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users role="editor"]</pre>
 					</td>
 				</tr>
 
@@ -235,13 +234,13 @@ class ACUI_Frontend{
 
                 <tr class="form-field">
 					<th scope="row"><label for=""><?php _e( 'Attribute from', 'import-users-from-csv-with-meta' ); ?></label></th>
-					<td><?php _e( 'You can use from attribute to filter users created from a specified date. Date format has to be: Y-m-d, for example:', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users from="<?php echo date( 'Y-m-d' ); ?>"]</pre>
+					<td><?php _e( 'You can use the from attribute to filter users created from a specified date. Date format has to be: Y-m-d, for example:', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users from="<?php echo date( 'Y-m-d' ); ?>"]</pre>
 					</td>
 				</tr>
 
                 <tr class="form-field">
 					<th scope="row"><label for=""><?php _e( 'Attribute to', 'import-users-from-csv-with-meta' ); ?></label></th>
-					<td><?php _e( 'You can use from attribute to filter users created before a specified date. Date format has to be: Y-m-d, for example:', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users to="<?php echo date( 'Y-m-d' ); ?>"]</pre>
+					<td><?php _e( 'You can use the from attribute to filter users created before a specified date. Date format has to be: Y-m-d, for example:', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users to="<?php echo date( 'Y-m-d' ); ?>"]</pre>
 					</td>
 				</tr>
 
@@ -253,13 +252,13 @@ class ACUI_Frontend{
 
                 <tr class="form-field">
 					<th scope="row"><label for=""><?php _e( 'Attribute order_fields_alphabetically', 'import-users-from-csv-with-meta' ); ?></label></th>
-					<td><?php _e( 'You can use order_fields_alphabetically attribute to order alphabetically the fields, for example', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users order_fields_alphabetically="yes"]</pre>
+					<td><?php _e( 'You can use order_fields_alphabetically attribute to order the fields alphabetically, for example', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users order_fields_alphabetically="yes"]</pre>
 					</td>
 				</tr>
 
 				<tr class="form-field">
 					<th scope="row"><label for=""><?php _e( 'Attribute double_encapsulate_serialized_values', 'import-users-from-csv-with-meta' ); ?></label></th>
-					<td><?php _e( "Serialized values sometimes can have problems being displayed in Microsoft Excel or LibreOffice, we can double encapsulate this kind of data but you would not be able to import this data beucase instead of serialized data it would be managed as strings", 'import-users-from-csv-with-meta' ); ?> <pre>[export-users double_encapsulate_serialized_values="yes"]</pre>
+					<td><?php _e( "Serialized values can sometimes have problems being displayed in Microsoft Excel or LibreOffice, we can double encapsulate this kind of data, but you would not be able to import this data because instead of serialized data it would be managed as strings", 'import-users-from-csv-with-meta' ); ?> <pre>[export-users double_encapsulate_serialized_values="yes"]</pre>
 					</td>
 				</tr>
 
@@ -271,15 +270,15 @@ class ACUI_Frontend{
 
                 <tr class="form-field">
 					<th scope="row"><label for=""><?php _e( 'Attribute orderby', 'import-users-from-csv-with-meta' ); ?></label></th>
-					<td><?php _e( 'You can use orderby attribute to set the order in which users would be exported. You can use some of the next fields or a meta_key:', 'import-users-from-csv-with-meta' ); ?>
+					<td><?php _e( 'You can use order by attribute to set the order in which users would be exported. You can use some of the next fields or a meta_key:', 'import-users-from-csv-with-meta' ); ?>
                         <ul style="list-style:disc outside none;margin-left:2em;">
-                            <li><strong>ID</strong>: <?php _e( 'Order by user id', 'import-users-from-csv-with-meta' ); ?></li>
+                            <li><strong>ID</strong>: <?php _e( 'Order by user ID', 'import-users-from-csv-with-meta' ); ?></li>
                             <li><strong>display_name</strong>: <?php _e( 'Order by user display name', 'import-users-from-csv-with-meta' ); ?></li>
                             <li><strong>name</strong> or <strong>user_name</strong>: <?php _e( 'Order by user name', 'import-users-from-csv-with-meta' ); ?></li>
                             <li><strong>login</strong> or <strong>user_login</strong>: <?php _e( 'Order by user login', 'import-users-from-csv-with-meta' ); ?></li>
                             <li><strong>nicename</strong> or <strong>user_nicename</strong>: <?php _e( 'Order by user nicename', 'import-users-from-csv-with-meta' ); ?></li>
                             <li><strong>email</strong> or <strong>user_email</strong>: <?php _e( 'Order by user email', 'import-users-from-csv-with-meta' ); ?></li>
-                            <li><strong>url</strong> or <strong>user_url</strong>: <?php _e( 'Order by user url', 'import-users-from-csv-with-meta' ); ?></li>
+                            <li><strong>url</strong> or <strong>user_url</strong>: <?php _e( 'Order by user URL', 'import-users-from-csv-with-meta' ); ?></li>
                             <li><strong>registered</strong> or <strong>user_registered</strong>: <?php _e( 'Order by user registered date', 'import-users-from-csv-with-meta' ); ?></li>
                             <li><strong>post_count</strong>: <?php _e( 'Order by user post count', 'import-users-from-csv-with-meta' ); ?></li>
                             <li><strong><?php _e( 'Any meta_key', 'import-users-from-csv-with-meta' ); ?></strong>: <?php _e( 'Order by user meta value', 'import-users-from-csv-with-meta' ); ?></li>
@@ -290,7 +289,7 @@ class ACUI_Frontend{
 
                 <tr class="form-field">
 					<th scope="row"><label for=""><?php _e( 'Attribute order', 'import-users-from-csv-with-meta' ); ?></label></th>
-					<td><?php _e( 'If you use orderby attrbute you can also use order attribute that designates the ascending or descending order of the "orderby" parameter, values can be "asc" or "desc", for example', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users orderby="display_name" order="asc"]</pre>
+					<td><?php _e( 'If you use the "orderby" parameter, you can also use the "order" parameter to designate the sort direction (ascending or descending), values of the parameter can be "asc" or "desc", for example', 'import-users-from-csv-with-meta' ); ?> <pre>[export-users orderby="display_name" order="asc"]</pre>
 					</td>
 				</tr>
 
@@ -384,7 +383,7 @@ class ACUI_Frontend{
 		ob_start();
 		
 		if( !current_user_can( apply_filters( 'acui_capability', 'create_users' ) ) )
-			wp_die( __( 'Only users who are able to create users can manage this form.', 'import-users-from-csv-with-meta' ) );
+			wp_die( __( 'Only users who are allowed to create users can manage this form.', 'import-users-from-csv-with-meta' ) );
 
 		if ( $_FILES && !empty( $_POST ) ):
 			if ( !wp_verify_nonce( $_POST['security'], 'codection-security' ) ){
@@ -498,7 +497,7 @@ class ACUI_Frontend{
 		ob_start();
 		
 		if( !current_user_can( apply_filters( 'acui_capability', 'create_users' ) ) )
-            wp_die( __( 'Only users who are able to create users can export them.', 'import-users-from-csv-with-meta' ) );
+            wp_die( __( 'Only users who are allowed to create users can export them.', 'import-users-from-csv-with-meta' ) );
 
         ACUI_Exporter::enqueue();
         ACUI_Exporter::styles();

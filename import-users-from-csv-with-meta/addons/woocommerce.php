@@ -1,5 +1,4 @@
 <?php
-
 use Automattic\WooCommerce\Admin\API\Reports\Customers\DataStore as CustomersDataStore;
 
 if ( ! defined( 'ABSPATH' ) ) exit; 
@@ -122,9 +121,9 @@ class ACUI_WooCommerce{
 
 	function new_wildcards_email(){
 		?>
-		<li>**woocommercelostpasswordurl** = <?php _e( 'WooCommerce lost password url', 'import-users-from-csv-with-meta' ); ?></li>
-		<li>**woocommercepasswordreseturl** = <?php _e( 'WooCommerce password reset url', 'import-users-from-csv-with-meta' ); ?>
-		<li>**woocommercepasswordreseturllink** = <?php _e( 'WooCommerce password reset url with HTML link', 'import-users-from-csv-with-meta' ); ?>
+		<li>**woocommercelostpasswordurl** = <?php _e( 'WooCommerce lost password URL', 'import-users-from-csv-with-meta' ); ?></li>
+		<li>**woocommercepasswordreseturl** = <?php _e( 'WooCommerce password reset URL', 'import-users-from-csv-with-meta' ); ?>
+		<li>**woocommercepasswordreseturllink** = <?php _e( 'WooCommerce password reset URL with HTML link', 'import-users-from-csv-with-meta' ); ?>
 		<?php
 	}
 

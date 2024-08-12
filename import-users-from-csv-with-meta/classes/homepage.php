@@ -75,7 +75,7 @@ class ACUI_Homepage{
 							</div>
 							<div id="introduce_path" style="display:none;">
 								<input placeholder="<?php printf( __( 'You have to enter the URL or the path to the file, i.e.: %s or %s' ,'import-users-from-csv-with-meta' ), $sample_path, $sample_url ); ?>" type="text" name="path_to_file" id="path_to_file" value="<?php echo $settings->get( 'path_to_file' ); ?>" style="width:70%;" />
-								<em><?php _e( 'or you can upload it directly from your PC', 'import-users-from-csv-with-meta' ); ?>, <a href="#" class="toggle_upload_path"><?php _e( 'click here', 'import-users-from-csv-with-meta' ); ?></a>.</em>
+								<em><?php _e( 'or you can upload it directly from your computer', 'import-users-from-csv-with-meta' ); ?>, <a href="#" class="toggle_upload_path"><?php _e( 'click here', 'import-users-from-csv-with-meta' ); ?></a>.</em>
 							</div>
 						</td>
 					</tr>
@@ -128,13 +128,13 @@ class ACUI_Homepage{
 					</tr>
 
 					<tr id="acui_send_email_wrapper" class="form-field">
-						<th scope="row"><label for="user_login"><?php _e( 'Send mail', 'import-users-from-csv-with-meta' ); ?></label></th>
+						<th scope="row"><label for="user_login"><?php _e( 'Send email', 'import-users-from-csv-with-meta' ); ?></label></th>
 						<td>
 							<p id="sends_email_wrapper">
-								<?php ACUIHTML()->checkbox( array( 'name' => 'sends_email', 'label' => __( 'Do you wish to send a mail from this plugin with credentials and other data? <a href="' . admin_url( 'tools.php?page=acui&tab=mail-options' ) . '">(email template found here)</a>', 'import-users-from-csv-with-meta' ), 'current' => 'yes', 'compare_value' => $settings->get( 'sends_email' ) ) ); ?>
+								<?php ACUIHTML()->checkbox( array( 'name' => 'sends_email', 'label' => sprintf( __( 'Do you wish to send an email from this plugin with credentials and other data? <a href="%s">(email template found here)</a>', admin_url( 'tools.php?page=acui&tab=mail-options' ) ), 'import-users-from-csv-with-meta' ), 'current' => 'yes', 'compare_value' => $settings->get( 'sends_email' ) ) ); ?>
 							</p>
 							<p id="send_email_updated_wrapper">
-								<?php ACUIHTML()->checkbox( array( 'name' => 'send_email_updated', 'label' => __( 'Do you wish to send this mail also to users that are being updated? (not only to the one which are being created)', 'import-users-from-csv-with-meta' ), 'current' => 'yes', 'compare_value' => $settings->get( 'send_email_updated' ) ) ); ?>
+								<?php ACUIHTML()->checkbox( array( 'name' => 'send_email_updated', 'label' => __( 'Do you wish to send this mail also to users that are being updated? (not just to the one which are being created)', 'import-users-from-csv-with-meta' ), 'current' => 'yes', 'compare_value' => $settings->get( 'send_email_updated' ) ) ); ?>
 							</p>
 						</td>
 					</tr>
@@ -142,7 +142,7 @@ class ACUI_Homepage{
 					<tr class="form-field form-required">
 						<th scope="row"><label for=""><?php _e( 'Force users to reset their passwords?', 'import-users-from-csv-with-meta' ); ?></label></th>
 						<td>
-							<?php ACUIHTML()->checkbox( array( 'name' => 'force_user_reset_password', 'label' => __( 'If a password is set to an user and you activate this option, the user will be forced to reset their password in their first login', 'import-users-from-csv-with-meta' ), 'current' => 'yes', 'compare_value' => $settings->get( 'force_user_reset_password' ) ) ); ?>
+							<?php ACUIHTML()->checkbox( array( 'name' => 'force_user_reset_password', 'label' => __( 'If a password is set to a user and you activate this option, the user will be forced to reset their password at their first login', 'import-users-from-csv-with-meta' ), 'current' => 'yes', 'compare_value' => $settings->get( 'force_user_reset_password' ) ) ); ?>
 							<p class="description"><?php echo sprintf( __( 'Please, <a href="%s">read the documentation</a> before activating this option', 'import-users-from-csv-with-meta' ), admin_url( 'tools.php?page=acui&tab=doc#force_user_reset_password' ) ); ?></p>
 						</td>
 					</tr>
@@ -182,7 +182,7 @@ class ACUI_Homepage{
 								'show_option_none' => false,
 								'selected' => $settings->get( 'update_emails_existing_users' ),
 							)); ?>
-							<p class="description"><?php _e( 'What the plugin should do if the plugin find an user, identified by their username, with a different email', 'import-users-from-csv-with-meta' ); ?></p>
+							<p class="description"><?php _e( 'What the plugin should do if the plugin find a user, identified by their username, with a different email', 'import-users-from-csv-with-meta' ); ?></p>
 						</td>
 					</tr>
 
@@ -190,7 +190,7 @@ class ACUI_Homepage{
 						<th scope="row"><label for="update_roles_existing_users"><?php _e( 'Update roles for existing users?', 'import-users-from-csv-with-meta' ); ?></label></th>
 						<td>
 							<?php ACUIHTML()->select( array(
-								'options' => array( 'no' => __( 'No', 'import-users-from-csv-with-meta' ), 'yes' => __( 'Yes, update and override existing roles', 'import-users-from-csv-with-meta' ), 'yes_no_override' => __( 'Yes, add new roles and not override existing ones', 'import-users-from-csv-with-meta' ) ),
+								'options' => array( 'no' => __( 'No', 'import-users-from-csv-with-meta' ), 'yes' => __( 'Yes, update and override existing roles', 'import-users-from-csv-with-meta' ), 'yes_no_override' => __( 'Yes, add new roles and do not override existing ones', 'import-users-from-csv-with-meta' ) ),
 								'name' => 'update_roles_existing_users',
 								'show_option_all' => false,
 								'show_option_none' => false,
@@ -203,7 +203,7 @@ class ACUI_Homepage{
 						<th scope="row"><label for="update_allow_update_passwords"><?php _e( 'Never update passwords?', 'import-users-from-csv-with-meta' ); ?></label></th>
 						<td>
 							<?php ACUIHTML()->select( array(
-								'options' => array( 'no' => __( 'Never update passwords when updating a user', 'import-users-from-csv-with-meta' ), 'yes_no_override' => __( 'Yes, add new roles and not override existing ones', 'import-users-from-csv-with-meta' ), 'yes' => __( 'Update passwords as it is described in documentation', 'import-users-from-csv-with-meta' ) ),
+								'options' => array( 'no' => __( 'Never update passwords when updating a user', 'import-users-from-csv-with-meta' ), 'yes_no_override' => __( 'Yes, add new roles and do not override existing ones', 'import-users-from-csv-with-meta' ), 'yes' => __( 'Update passwords as it is described in documentation', 'import-users-from-csv-with-meta' ) ),
 								'name' => 'update_allow_update_passwords',
 								'show_option_all' => false,
 								'show_option_none' => false,
@@ -235,10 +235,10 @@ class ACUI_Homepage{
 									'options' => $delete_users_assign_posts_options,
 									'name' => 'delete_users_assign_posts',
 									'show_option_all' => false,
-									'show_option_none' => __( 'Delete posts of deleted users without assigning to any user or type to search a user', 'import-users-from-csv-with-meta' ),
+									'show_option_none' => __( 'Delete posts of deleted users without assigning them to another user, or type to search for a user to assign the posts to', 'import-users-from-csv-with-meta' ),
 									'selected' => $delete_users_assign_posts_option_selected,
 								)); ?>
-								<p class="description"><?php _e( 'Administrators will not be deleted anyway. After delete users, we can choose if we want to assign their posts to another user. If you do not choose some user, content will be deleted.', 'import-users-from-csv-with-meta' ); ?></p>
+								<p class="description"><?php _e( 'Administrators will not be deleted anyway. After deleting users, you can choose if you want to assign their posts to another user. If you do not choose a user, their content will be deleted.', 'import-users-from-csv-with-meta' ); ?></p>
 							</div>
 						</td>
 					</tr>
@@ -257,7 +257,7 @@ class ACUI_Homepage{
 									'show_option_none' => false,
 									'selected' => $settings->get( 'change_role_not_present_role' ),
 								)); ?>
-								<p class="description"><?php _e( 'After import users which is not present in the CSV and can be changed to a different role.', 'import-users-from-csv-with-meta' ); ?></p>
+								<p class="description"><?php _e( 'After importing users from a CSV, users not present in the CSV can have their roles changed to a different role.', 'import-users-from-csv-with-meta' ); ?></p>
 							</div>
 						</td>
 					</tr>
@@ -315,7 +315,7 @@ class ACUI_Homepage{
 
 				<div class="sidebar_section donate">
 					<a class="donate-button" color="primary" type="button" name="donate-button" data-tag="donate" href="https://paypal.me/imalrod" role="button" target="_blank">
-						<div><span><?php _e( 'If you want to help us to continue developing it and give the best support you can donate', 'import-users-from-csv-with-meta'); ?></span></div>
+						<div><span><?php _e( 'If you want to help us to continue developing it and give the best support, you can donate', 'import-users-from-csv-with-meta'); ?></span></div>
 					</a>
 				</div>
 				
@@ -383,7 +383,7 @@ class ACUI_Homepage{
 		$( '.acui-checkbox.roles[value="no_role"]' ).click( function(){
 			var checked = $( this ).is(':checked');
 			if( checked ) {
-				if( !confirm( '<?php _e( 'Are you sure you want to disables roles from this users?', 'import-users-from-csv-with-meta' ); ?>' ) ){         
+				if( !confirm( '<?php _e( 'Are you sure you want to disables roles from these users?', 'import-users-from-csv-with-meta' ); ?>' ) ){         
 					$( this ).removeAttr( 'checked' );
 					return;
 				}
@@ -405,7 +405,7 @@ class ACUI_Homepage{
 		});
 
 		$( '.delete_attachment' ).click( function(){
-			var answer = confirm( "<?php _e( 'Are you sure to delete this file?', 'import-users-from-csv-with-meta' ); ?>" );
+			var answer = confirm( "<?php _e( 'Are you sure you want to delete this file?', 'import-users-from-csv-with-meta' ); ?>" );
 			if( answer ){
 				var data = {
 					'action': 'acui_delete_attachment',
@@ -425,7 +425,7 @@ class ACUI_Homepage{
 		});
 
 		$( '#bulk_delete_attachment' ).click( function(){
-			var answer = confirm( "<?php _e( 'Are you sure to delete ALL CSV files uploaded? There can be CSV files from other plugins.', 'import-users-from-csv-with-meta' ); ?>" );
+			var answer = confirm( "<?php _e( 'Are you sure you want to delete ALL CSV files uploaded? There can be CSV files from other plugins.', 'import-users-from-csv-with-meta' ); ?>" );
 			if( answer ){
 				var data = {
 					'action': 'acui_bulk_delete_attachment',
@@ -434,7 +434,7 @@ class ACUI_Homepage{
 
 				$.post(ajaxurl, data, function(response) {
 					if( response != 1 )
-						alert( "<?php _e( 'There were problems deleting the files, please check files permissions', 'import-users-from-csv-with-meta' ); ?>" );
+						alert( "<?php _e( 'There were problems deleting the files, please check file permissions', 'import-users-from-csv-with-meta' ); ?>" );
 					else{
 						alert( "<?php _e( 'Files successfully deleted', 'import-users-from-csv-with-meta' ); ?>" );
 						document.location.reload();
@@ -504,7 +504,7 @@ class ACUI_Homepage{
 		    <h3 class="hndle"><span>&nbsp;&nbsp;&nbsp;<?php _e( 'Old CSV files uploaded', 'import-users-from-csv-with-meta' ); ?></span></h3>
 
 		    <div class="inside" style="display: block;">
-		    	<p><?php _e( 'For security reasons you should delete this files, probably they would be visible in the Internet if a bot or someone discover the URL. You can delete each file or maybe you want delete all CSV files you have uploaded:', 'import-users-from-csv-with-meta' ); ?></p>
+		    	<p><?php _e( 'For security reasons you should delete these files, probably they would be visible on the Internet if a bot or someone discover the URL. You can delete each file or maybe you want to delete all CSV files you have uploaded:', 'import-users-from-csv-with-meta' ); ?></p>
 		    	<input type="button" value="<?php _e( 'Delete all CSV files uploaded', 'import-users-from-csv-with-meta' ); ?>" id="bulk_delete_attachment" style="float:right;" />
 		    	<ul>
 		    		<?php while($old_csv_files->have_posts()) : 
@@ -529,13 +529,13 @@ class ACUI_Homepage{
 		check_ajax_referer( 'codection-security', 'security' );
 	
 		if( ! current_user_can( apply_filters( 'acui_capability', 'create_users' ) ) )
-            wp_die( __( 'Only users who are able to create users can delete CSV attachments.', 'import-users-from-csv-with-meta' ) );
+            wp_die( __( 'Only users who are allowed to create users can delete CSV attachments.', 'import-users-from-csv-with-meta' ) );
 	
 		$attach_id = absint( $_POST['attach_id'] );
 		$mime_type  = (string) get_post_mime_type( $attach_id );
 	
 		if( $mime_type != 'text/csv' )
-			_e('This plugin only can delete the type of file it manages, CSV files.', 'import-users-from-csv-with-meta' );
+			_e('This plugin can only delete the type of file it manages, i.e. CSV files.', 'import-users-from-csv-with-meta' );
 	
 		$result = wp_delete_attachment( $attach_id, true );
 	
@@ -551,7 +551,7 @@ class ACUI_Homepage{
 		check_ajax_referer( 'codection-security', 'security' );
 	
 		if( ! current_user_can( apply_filters( 'acui_capability', 'create_users' ) ) )
-        wp_die( __( 'Only users who are able to create users can bulk delete CSV attachments.', 'import-users-from-csv-with-meta' ) );
+        wp_die( __( 'Only users who are allowed to create users can bulk delete CSV attachments.', 'import-users-from-csv-with-meta' ) );
 	
 		$args_old_csv = array( 'post_type'=> 'attachment', 'post_mime_type' => 'text/csv', 'post_status' => 'inherit', 'posts_per_page' => -1 );
 		$old_csv_files = new WP_Query( $args_old_csv );
@@ -562,7 +562,7 @@ class ACUI_Homepage{
 	
 			$mime_type  = (string) get_post_mime_type( get_the_ID() );
 			if( $mime_type != 'text/csv' )
-				wp_die( __('This plugin only can delete the type of file it manages, CSV files.', 'import-users-from-csv-with-meta' ) );
+				wp_die( __('This plugin can only delete the type of file it manages, i.e. CSV files.', 'import-users-from-csv-with-meta' ) );
 	
 			if( wp_delete_attachment( get_the_ID(), true ) === false )
 				$result = 0;
@@ -579,7 +579,7 @@ class ACUI_Homepage{
         check_ajax_referer( 'codection-security', 'security' );
 	
 		if( ! current_user_can( apply_filters( 'acui_capability', 'create_users' ) ) )
-            wp_die( __( 'Only users who are able to create users can manage this option.', 'import-users-from-csv-with-meta' ) );
+            wp_die( __( 'Only users who are allowed to create users can manage this option.', 'import-users-from-csv-with-meta' ) );
 
         $results = array( array( 'id' => '', 'value' => __( 'Delete posts of deleted users without assigning to any user', 'import-users-from-csv-with-meta' ) ) );
         $search = sanitize_text_field( $_GET['search'] );

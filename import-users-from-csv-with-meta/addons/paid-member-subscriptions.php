@@ -26,9 +26,9 @@ class ACUI_PaidMemberSubscriptions{
 			<th scope="row"><?php _e( "Paid Member Subscriptions is activated", 'import-users-from-csv-with-meta' ); ?></th>
 			<td><?php _e( "Plugin can create member subscriptions while this is importing. You will need to use those columns:", 'import-users-from-csv-with-meta' ); ?>
 				<ul style="list-style:disc outside none; margin-left:2em;">
-					<li><?php _e( "<strong>subscription_plan_id</strong>: you can find it in Paid Member Subscriptions, Subscriptions Plans ", 'import-users-from-csv-with-meta' ); ?></li>
-					<li><?php _e( "<strong>start_date <em>(optional)</em></strong>: if you leave empty, current moment will be used, format is Y-m-d H:i:s", 'import-users-from-csv-with-meta' ); ?></li>
-                    <li><?php _e( "<strong>expiration_date (optional)</strong>: if you leave it empty, no expired date will be defined", 'import-users-from-csv-with-meta' ); ?></li>
+					<li><?php _e( "<strong>subscription_plan_id</strong>: you can find it in Paid Member Subscriptions, Subscription Plans", 'import-users-from-csv-with-meta' ); ?></li>
+					<li><?php _e( "<strong>start_date <em>(optional)</em></strong>: if you leave it empty, today's date will be used, format is Y-m-d H:i:s", 'import-users-from-csv-with-meta' ); ?></li>
+                    <li><?php _e( "<strong>expiration_date (optional)</strong>: if you leave it empty, no expiration date will be defined", 'import-users-from-csv-with-meta' ); ?></li>
                     <li><?php _e( "<strong>status <em>(optional)</em></strong>: if you do not fill it, active will be used", 'import-users-from-csv-with-meta' ); ?></li>
 				</ul>
 			</td>

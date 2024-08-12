@@ -34,13 +34,13 @@ class ACUI_Email_Options{
 							</legend>
 							<label for="automatic_created_edited_wordpress_email">
                                 <?php ACUIHTML()->select( array(
-                                    'options' => array( 'false' => __( "Deactivate WordPress automatic email when an user is created or edited", 'import-users-from-csv-with-meta' ), 'true' => __( 'Activate WordPress automatic email when an user is created or edited', 'import-users-from-csv-with-meta' ) ),
+                                    'options' => array( 'false' => __( "Deactivate WordPress automatic email when a user is created or edited", 'import-users-from-csv-with-meta' ), 'true' => __( 'Activate WordPress automatic email when a user is created or edited', 'import-users-from-csv-with-meta' ) ),
                                     'name' => 'automatic_created_edited_wordpress_email',
                                     'selected' => $automatic_created_edited_wordpress_email,
                                     'show_option_all' => false,
                                     'show_option_none' => false,
                                 )); ?>
-								<span class="description"><? _e( "When you create or update an user, WordPress prepare and send automatic email, you can deactivate it here.", 'import-users-from-csv-with-meta' ); ?></span>
+								<span class="description"><? _e( "When you create or update a user, WordPress prepares and sends an automatic email, you can deactivate it here.", 'import-users-from-csv-with-meta' ); ?></span>
 							</label>
 						</fieldset>
 					</td>
@@ -54,13 +54,16 @@ class ACUI_Email_Options{
 							</legend>
 							<label for="automatic_wordpress_email">
                                 <?php ACUIHTML()->select( array(
-                                    'options' => array( 'false' => __( "Deactivate WordPress automatic email when an user is updated or his password is changed", 'import-users-from-csv-with-meta' ), 'true' => __( 'Activate WordPress automatic email when an user is updated or his password is changed', 'import-users-from-csv-with-meta' ) ),
+                                    'options' => array( 
+										'false' => __( 'Deactivate WordPress automatic email when a user is updated or their password is changed', 'import-users-from-csv-with-meta' ), 
+										'true' => __( 'Activate WordPress automatic email when a user is updated or their password is changed', 'import-users-from-csv-with-meta' ) 
+									),
                                     'name' => 'automatic_wordpress_email',
                                     'selected' => $automatic_wordpress_email,
                                     'show_option_all' => false,
                                     'show_option_none' => false,
                                 )); ?>
-								<span class="description"><? _e( "When you update an user or change his password, WordPress prepare and send automatic email, you can deactivate it here.", 'import-users-from-csv-with-meta' ); ?></span>
+								<span class="description"><? _e( "When you update a user or change their password, WordPress prepares and sends automatic email, you can deactivate it here.", 'import-users-from-csv-with-meta' ); ?></span>
 							</label>
 						</fieldset>
 					</td>
@@ -135,7 +138,7 @@ class ACUI_Email_Options{
 		<br/>
 		<input class="button-primary" type="submit" value="<?php _e( 'Save email template and options', 'import-users-from-csv-with-meta'); ?>" id="save_mail_template_options"/>
 		<input class="button-primary" type="button" value="<?php _e( 'Send test email', 'import-users-from-csv-with-meta'); ?>" id="send_test_email" title="<?php _e( 'This test email will be sent to the current user', 'import-users-from-csv-with-meta'); ?>"/>
-        <?php _e( 'If you send a test email, no wildcards will be replaced becuase when you test, we have no data to replace.', 'import-users-from-csv-with-meta' ); ?>
+        <?php _e( 'If you send a test email, no wildcards will be replaced because there is no data to replace when testing.', 'import-users-from-csv-with-meta' ); ?>
 
 		<?php wp_nonce_field( 'codection-security', 'security' ); ?>
 		

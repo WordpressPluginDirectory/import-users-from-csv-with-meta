@@ -14,7 +14,7 @@ function acui_new_user_approve_tab_import_before_import_button(){
 	<table class="form-table">
 		<tbody>
 		<tr class="form-field form-required">
-			<th scope="row"><label><?php _e( 'Approve users at the same time is being created', 'import-users-from-csv-with-meta' ); ?></label></th>
+			<th scope="row"><label><?php _e( 'Approve users at the same time they are being created', 'import-users-from-csv-with-meta' ); ?></label></th>
 			<td>
 				<select name="approve_users_new_user_appove">
 					<option value="no_approve"><?php _e( 'Do not approve users', 'import-users-from-csv-with-meta' ); ?></option>

@@ -119,7 +119,7 @@ class ACUI_Buddypress{
 		?>
 		<tr valign="top">
 			<th scope="row"><?php _e( 'BuddyPress/BuddyBoss fields', 'import-users-from-csv-with-meta'); ?></th>
-			<td><?php _e( 'You can insert any profile from BuddyPress using his name as header. Plugin will check, before import, which fields are defined in BuddyPress and will assign it in the update. You can use this fields:', 'import-users-from-csv-with-meta' ); ?>
+			<td><?php _e( 'You can insert any profile from BuddyPress using its name as header. The plugin will check, before importing, which fields are defined in BuddyPress and will assign them in the update. You can use these fields:', 'import-users-from-csv-with-meta' ); ?>
 				<ul style="list-style:disc outside none;margin-left:2em;">
 					<?php foreach ( $this->get_fields_name() as $buddypress_field ): 
 						$type = $this->get_field_type( $buddypress_field ); 
@@ -132,7 +132,7 @@ class ACUI_Buddypress{
 		</tr>
 		<tr valign="top">
 			<th scope="row"><?php _e( 'BuddyPress/BuddyBoss avatar', 'import-users-from-csv-with-meta' ); ?></th>
-			<td><?php _e( 'You can import users avatars using a column called <strong>bp_avatar</strong>, in this field you can place:', 'import-users-from-csv-with-meta' ); ?>
+			<td><?php _e( 'You can import user avatars using a column called <strong>bp_avatar</strong>. In this field you can place:', 'import-users-from-csv-with-meta' ); ?>
 			<ul style="list-style:disc outside none;margin-left:2em;">
 					<li>An integer which identify the ID of an attachment uploaded to your media library</li>
 					<li>A string that contain a path or an URL to the image</li>
@@ -141,16 +141,16 @@ class ACUI_Buddypress{
 		</tr>
 		<tr valign="top">
 			<th scope="row"><?php _e( "BuddyPress/BuddyBoss groups and roles", 'import-users-from-csv-with-meta' ); ?></th>
-			<td><?php _e( "You can use the <strong>profile fields</strong> you have created and also you can set one or more groups for each user. For example:", 'import-users-from-csv-with-meta' ); ?>
+			<td><?php _e( "You can use the <strong>profile fields</strong> you have created and also can set one or more groups for each user. For example:", 'import-users-from-csv-with-meta' ); ?>
 				<ul style="list-style:disc outside none; margin-left:2em;">
-					<li><?php _e( "If you want to assign an user to a group you have to create a column 'bp_group' and a column 'bp_group_role'", 'import-users-from-csv-with-meta' ); ?></li>
-					<li><?php _e( "Then in each cell you have to fill with the BuddyPress <strong>group slug</strong>", 'import-users-from-csv-with-meta' ); ?></li>
+					<li><?php _e( "If you want to assign a user to a group, you have to create a column 'bp_group' and a column 'bp_group_role'", 'import-users-from-csv-with-meta' ); ?></li>
+					<li><?php _e( "Then in each cell you have to fill in the BuddyPress <strong>group slug</strong>", 'import-users-from-csv-with-meta' ); ?></li>
                     <li><?php _e( "And the role assigned in this group:", 'import-users-from-csv-with-meta' ); ?>  <em>Administrator, Moderator or Member</em></li>
-					<li><?php _e( "You can also use group ids if you know it using a column 'bp_group_id' instead of 'bp_group'", 'import-users-from-csv-with-meta' ); ?></li>
+					<li><?php _e( "You can also use group IDs if you know them, using a column 'bp_group_id' instead of 'bp_group'", 'import-users-from-csv-with-meta' ); ?></li>
 					<li><?php _e( "You can do it with multiple groups at the same time using commas to separate different groups, in bp_group column, i.e.: <em>group_1, group_2, group_3</em>", 'import-users-from-csv-with-meta' ); ?></li>
 					<li><?php _e( "But you will have to assign a role for each group:", 'import-users-from-csv-with-meta' ); ?> <em>Moderator,Moderator,Member,Member</em></li>
-                    <li><?php _e( "If you choose to update roles and group role is empty, user will be removed from the group", 'import-users-from-csv-with-meta' ); ?></li>
-					<li><?php _e( "If you get some error of this kind:", 'import-users-from-csv-with-meta' ); ?> <code>Fatal error: Class 'BP_XProfile_Group'</code> <?php _e( "please enable Buddypress Extended Profile then import the csv file. You can then disable this afterwards", 'import-users-from-csv-with-meta' ); ?></li>
+                    <li><?php _e( "If you choose to update roles and group role is empty, the user will be removed from the group", 'import-users-from-csv-with-meta' ); ?></li>
+					<li><?php _e( "If you get an error of this kind:", 'import-users-from-csv-with-meta' ); ?> <code>Fatal error: Class 'BP_XProfile_Group'</code> <?php _e( "please enable BuddyPress Extended Profile then import the CSV file. You can then disable it afterwards", 'import-users-from-csv-with-meta' ); ?></li>
 				</ul>
 			</td>
 		</tr>
@@ -334,5 +334,6 @@ class ACUI_Buddypress{
 		}
 	}
 }
+
 $acui_buddypress = new ACUI_Buddypress();
 $acui_buddypress->hooks();

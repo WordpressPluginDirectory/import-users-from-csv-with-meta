@@ -1,4 +1,5 @@
 <?php
+
 if ( ! defined( 'ABSPATH' ) ) exit; 
 
 if( !is_plugin_active( 'wp-user-avatar/wp-user-avatar.php' ) ){
@@ -30,10 +31,10 @@ class ACUI_WPUA{
         <tr valign="top">
             <th scope="row"><?php _e( "WP Users Avatar is activated", 'import-users-from-csv-with-meta' ); ?></th>
             <td>
-                <?php _e( "You can import user avatar and assign them to the users using the next format", 'import-users-from-csv-with-meta' ); ?>.
+                <?php _e( "You can import user avatar and assign them to the users using the following format", 'import-users-from-csv-with-meta' ); ?>.
                 <ul style="list-style:disc outside none; margin-left:2em;">
                     <li><?php _e( "avatar_url as the column title", 'import-users-from-csv-with-meta' ); ?></li>
-                    <li><?php _e( "The value of each cell will be the url to the image in your system", 'import-users-from-csv-with-meta' ); ?></li>
+                    <li><?php _e( "The value of each cell will be the URL to the image in your system", 'import-users-from-csv-with-meta' ); ?></li>
                 </ul>
             </td>
         </tr>

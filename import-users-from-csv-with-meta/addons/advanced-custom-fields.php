@@ -24,16 +24,16 @@ class ACUI_ACF{
 		$fields = $this->get_user_fields();
 		?>
 		<tr valign="top">
-			<th scope="row"><?php _e( "Advaced Custom Fields is activated", 'import-users-from-csv-with-meta' ); ?></th>
+			<th scope="row"><?php _e( "Advanced Custom Fields is activated", 'import-users-from-csv-with-meta' ); ?></th>
 			<td>
-				<?php _e( "You can import those fields, look at every group which fields you can import using the column names shown below.", 'import-users-from-csv-with-meta' ); ?>.
+				<?php _e( "You can import those fields. Look at every group whose fields you can import using the column names shown below.", 'import-users-from-csv-with-meta' ); ?>.
 				<ul style="list-style:disc outside none; margin-left:2em;">
 				<?php foreach ( $this->get_user_fields() as $group => $fields ): ?>
 					<li><?php _e( "Group name", 'import-users-from-csv-with-meta' ); ?>: <em><?php echo $group; ?></em></li>
 					<ul style="list-style:square inside none; margin-left:2em;">
 						<?php foreach ( $fields as $field ): ?>
 						<li><?php echo $field['label']; ?> <em>(type: <?php echo $field['type']; ?>)</em> - Column name in the CSV: <strong><?php echo $field['name']; ?></strong>
-						<?php if( $field['type'] == 'image'  ): ?><em><?php _e( "(you must use as value the URL of the image)", 'import-users-from-csv-with-meta' ); ?></em><?php endif; ?>
+						<?php if( $field['type'] == 'image'  ): ?><em><?php _e( "(you must use the URL of the image as value)", 'import-users-from-csv-with-meta' ); ?></em><?php endif; ?>
 						</li>
 						<?php endforeach; ?>
 					</ul>

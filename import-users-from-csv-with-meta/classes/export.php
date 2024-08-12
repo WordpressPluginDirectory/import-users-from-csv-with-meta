@@ -22,7 +22,7 @@ class ACUI_Exporter{
             'step' => __( 'Step', 'import-users-from-csv-with-meta' ),
             'of_approximately' => __( 'of approximately', 'import-users-from-csv-with-meta' ),
             'steps' => __( 'steps', 'import-users-from-csv-with-meta' ),
-            'error_thrown' => __( 'Error thrown in the server, we cannot continue. Please check console to see full details about the error.', 'import-users-from-csv-with-meta' ),
+            'error_thrown' => __( 'Error thrown on the server, cannot continue. Please check console to see full details about the error.', 'import-users-from-csv-with-meta' ),
         ) );
     }
 
@@ -111,7 +111,7 @@ class ACUI_Exporter{
 					<th scope="row"><?php _e( 'Columns', 'import-users-from-csv-with-meta' ); ?></th>
 					<td>
 						<?php ACUIHTML()->textarea( array( 'name' => 'columns', 'value' => $settings->get( 'columns' ) ) ); ?>
-						<span class="description"><?php _e( 'You can use this field to set which columns must be exported and in which order.  If you leave it empty, all columns will be exported. Use a list of fields separated by commas, for example', 'import-users-from-csv-with-meta' ); ?>: user_email,first_name,last_name</span>
+						<span class="description"><?php _e( 'You can use this field to set which columns must be exported and in which order. If you leave it empty, all columns will be exported. Use a list of fields separated by commas, for example', 'import-users-from-csv-with-meta' ); ?>: user_email,first_name,last_name</span>
 					</td>
 				</tr>
 				<tr id="acui_user_created_wrapper" valign="top">
@@ -138,21 +138,21 @@ class ACUI_Exporter{
 					<td>
                         <?php ACUIHTML()->checkbox( array( 'name' => 'convert_timestamp', 'current' => 'yes', 'compare_value' => $settings->get( 'convert_timestamp' ) ) ); ?>
 						<?php ACUIHTML()->text( array( 'name' => 'datetime_format', 'value' => 'Y-m-d H:i:s', 'class' => '', 'value' => $settings->get( 'datetime_format' ) ) ); ?>
-                        <span class="description"><a href="https://www.php.net/manual/en/datetime.formats.php"><?php _e( 'accepted formats', 'import-users-from-csv-with-meta' ); ?></a> <?php _e( 'If you have problems and you get some value exported as a date that should not be converted to date, please deactivate this option. If this option is not activated, datetime format will be ignored.', 'import-users-from-csv-with-meta' ); ?></span>
+                        <span class="description"><a href="https://www.php.net/manual/en/datetime.formats.php"><?php _e( 'accepted formats', 'import-users-from-csv-with-meta' ); ?></a> <?php _e( 'If you have problems and you get some value exported as a date that should not be converted to a date, please deactivate this option. If this option is not activated, datetime format will be ignored.', 'import-users-from-csv-with-meta' ); ?></span>
 					</td>
 				</tr>
 				<tr id="acui_order_fields_alphabetically_wrapper" valign="top">
 					<th scope="row"><?php _e( 'Order fields alphabetically', 'import-users-from-csv-with-meta' ); ?></th>
 					<td>
                         <?php ACUIHTML()->checkbox( array( 'name' => 'order_fields_alphabetically', 'current' => 'yes', 'compare_value' => $settings->get( 'order_fields_alphabetically' ) ) ); ?>
-						<span class="description"><?php _e( "Order all columns alphabetically to check easier your data. First two columns won't be affected", 'import-users-from-csv-with-meta' ); ?></span>
+						<span class="description"><?php _e( "Order all columns alphabetically to check your data more easily. The first two columns won't be affected", 'import-users-from-csv-with-meta' ); ?></span>
 					</td>
 				</tr>
                 <tr id="acui_order_fields_double_encapsulate_serialized_values" valign="top">
 					<th scope="row"><?php _e( 'Double encapsulate serialized values', 'import-users-from-csv-with-meta' ); ?></th>
 					<td>
                         <?php ACUIHTML()->checkbox( array( 'name' => 'double_encapsulate_serialized_values', 'current' => 'yes', 'compare_value' => $settings->get( 'double_encapsulate_serialized_values' ) ) ); ?>                    
-						<span class="description"><?php _e( "Serialized values sometimes can have problems being displayed in Microsoft Excel or LibreOffice, we can double encapsulate this kind of data but you would not be able to import this data beucase instead of serialized data it would be managed as strings", 'import-users-from-csv-with-meta' ); ?></span>
+						<span class="description"><?php _e( "Serialized values can sometimes have problems being displayed in Microsoft Excel or LibreOffice, we can double encapsulate this kind of data, but you would not be able to import this data because instead of serialized data it would be managed as strings", 'import-users-from-csv-with-meta' ); ?></span>
 					</td>
 				</tr>
 				<tr id="acui_order_fields_display_arrays_as_comma_separated_list_of_values" valign="top">
@@ -235,11 +235,11 @@ class ACUI_Exporter{
 		$results = array();
 
 		foreach( $bad_character_formulas_values_cleaned as $info ){
-			$results[] = sprintf( __( 'User with id: %s has the cell of the column: %s edited because has content that may auto-run formulas in certain spreadsheet apps, new value is: %s', 'import-users-from-csv-with-meta' ), $info['user_id'], $info['key'], $info['value'] );
+			$results[] = sprintf( __( 'User with id: %s. The cell in column %s has been edited because its content may contain formulas that are automatically run in certain spreadsheet apps. The new value is: %s', 'import-users-from-csv-with-meta' ), $info['user_id'], $info['key'], $info['value'] );
 		}
 
 		$ret = '<h3>' . __( 'Export results','import-users-from-csv-with-meta' ) . '</h3>';
-		$ret .= '<h4>' . __( 'Some values has been altered','import-users-from-csv-with-meta' ) . '</h4>';
+		$ret .= '<h4>' . __( 'Some values have been altered','import-users-from-csv-with-meta' ) . '</h4>';
 		$ret .= '<ul>';
 		foreach( $results as $result ){
 			$ret .= '<li>' . $result . '</li>';
@@ -254,7 +254,7 @@ class ACUI_Exporter{
         check_ajax_referer( 'codection-security', 'security' );
 
 		if( !current_user_can( apply_filters( 'acui_capability', 'create_users' ) ) )
-			wp_die( __( 'Only users who are able to create users can export them.', 'import-users-from-csv-with-meta' ) );
+			wp_die( __( 'Only users who are allowed to create users can export them.', 'import-users-from-csv-with-meta' ) );
     
         $step = isset( $_POST['step'] ) ? absint( $_POST['step'] ) : 1;
                 

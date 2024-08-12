@@ -72,7 +72,7 @@ class ACUI_Actions{
 			<th scope="row"><?php _e( 'Actions', 'import-users-from-csv-with-meta' ); ?></th>
 			<td><?php _e( 'You can do some actions while you are importing. You have to name the column as indicated below and follow the instructions:', 'import-users-from-csv-with-meta' ); ?>
 			<ul style="list-style:disc outside none;margin-left:2em;">
-					<li><strong>#action_assign_post</strong>: <?php _e( 'Within each cell, you must indicate the post_id that will be assigned to this user. You can use a list separating each ID by commas. The post can be of any post type.', 'import-users-from-csv-with-meta' ); ?></li>
+					<li><strong>#action_assign_post</strong>: <?php _e( 'Within each cell, you must indicate the post_id that will be assigned to this user. You can use a list, separating each ID with commas. The post can be of any post type.', 'import-users-from-csv-with-meta' ); ?></li>
 				</ul>
 			</td>
 		</tr>

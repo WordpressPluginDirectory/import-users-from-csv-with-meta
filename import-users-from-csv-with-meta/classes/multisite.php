@@ -25,10 +25,10 @@ class ACUI_Multisite{
 		?>
 		<tr valign="top">
 			<th scope="row"><?php _e( "Multisite is activated", 'import-users-from-csv-with-meta' ); ?></th>
-			<td><?php _e( "Plugin can assing users to blogs after importing them roles. This is how it works:", 'import-users-from-csv-with-meta' ); ?>
+			<td><?php _e( "Plugin can assign users to blogs after importing their roles. This is how it works:", 'import-users-from-csv-with-meta' ); ?>
 				<ul style="list-style:disc outside none; margin-left:2em;">
-					<li><?php _e( "You have to <strong>create a column called 'blogs'</strong>: if cell is empty, it won't assign users to any blog; if cell has a value, it will be used. You have to fill it with blog_id.", 'import-users-from-csv-with-meta' ); ?></li>
-					<li><?php _e( "Multiple blogs can be assigned creating <strong>a list of blog ids</strong> using commas to separate values.", 'import-users-from-csv-with-meta' ); ?></li>
+					<li><?php _e( "You have to <strong>create a column called 'blogs'</strong>: if the cell is empty, it won't assign users to any blog; if the cell has a value, it will be used. You have to fill it with blog_id.", 'import-users-from-csv-with-meta' ); ?></li>
+					<li><?php _e( "Multiple blogs can be assigned creating <strong>a list of blog IDs</strong> using commas to separate values.", 'import-users-from-csv-with-meta' ); ?></li>
 					<li><?php _e( "You can also use the word 'all' and it will be added to all the blogs in the network.", 'import-users-from-csv-with-meta' ); ?></li>
 				</ul>
 			</td>
@@ -104,12 +104,13 @@ class ACUI_Multisite{
 		<?php _e( 'Multisite activated', 'import-users-from-csv-with-meta' ); ?>
 		<ul style="list-style-type:disc; margin-left:2em;">
 			<li>**passwordreseturl** = <?php _e( "It will work as follows: if there is only one site in the network, the URL will be that site's URL; if there is more than one site, it will lead to the login of the main site in the network of sites.", 'import-users-from-csv-with-meta' ); ?></li>
-			<li>**passwordreseturllink** = <?php _e( "same behaviour as above", 'import-users-from-csv-with-meta' ); ?></li>
+			<li>**passwordreseturllink** = <?php _e( "same behavior as above", 'import-users-from-csv-with-meta' ); ?></li>
 			<?php foreach( $this->sites as $subsite ): ?>
-			<li>**passwordreseturl_<?php echo get_object_vars( $subsite )["blog_id"]; ?>**: <?php _e( 'password reset url for the sub-site', 'import-users-from-csv-with-meta' ); ?> <?php echo get_object_vars( $subsite )["path"]; ?></li>
+			<li>**passwordreseturl_<?php echo get_object_vars( $subsite )["blog_id"]; ?>**: <?php _e( 'password reset URL for the sub-site', 'import-users-from-csv-with-meta' ); ?> <?php echo get_object_vars( $subsite )["path"]; ?></li>
 			<?php endforeach; ?>
 		</ul>
 		<?php
 	}
 }
+
 new ACUI_Multisite();

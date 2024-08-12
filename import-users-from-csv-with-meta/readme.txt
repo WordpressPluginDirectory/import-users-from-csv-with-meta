@@ -3,8 +3,8 @@ Contributors: carazo, hornero
 Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter
 Requires at least: 3.4
-Tested up to: 6.6
-Stable tag: 1.26.9
+Tested up to: 6.6.1
+Stable tag: 1.27.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -116,6 +116,16 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.27.1 =
+*   New version of ActionScheduler included
+
+= 1.27 =
+*   Improved many texts of the plugin thanks to the great help of Pierre Darmon who has completely revised the plugin's writing and helped us to make it more understandable and professional, for us who do not speak English natively
+*   Fixed a problem that could create errors when trying to export data when there was a saved object
+
+= 1.26.10 =
+*   Improved the compatibility with Google Docs/Drive spreadsheet exported as CSV
 
 = 1.26.9 =
 *   CSVs are now never saved as WordPress attachments, even if they are later deleted, they are now read directly from temporary paths

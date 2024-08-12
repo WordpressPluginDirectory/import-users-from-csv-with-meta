@@ -20,7 +20,7 @@ function acui_mp_documentation_after_plugins_activated(){
 		<th scope="row"><?php _e( "MailPoet is activated", 'import-users-from-csv-with-meta' ); ?></th>
 		<td>
 			<ol>
-				<li><strong><?php _e( "Subscribe users to MailPoet lists", 'import-users-from-csv-with-meta' ); ?></strong>: <?php _e( "In this case you will only have to use <strong>mailpoet_list_ids</strong> column in order to associate a user to their users list, you can use a ID or a list of IDs separated by commas", 'import-users-from-csv-with-meta' ); ?>.</li>
+				<li><strong><?php _e( "Subscribe users to MailPoet lists", 'import-users-from-csv-with-meta' ); ?></strong>: <?php _e( "In this case you will only have to use the <strong>mailpoet_list_ids</strong> column in order to associate a user with their user list. You can use an ID or a list of IDs separated by commas", 'import-users-from-csv-with-meta' ); ?>.</li>
 			</ol>
 		</td>
 	</tr>

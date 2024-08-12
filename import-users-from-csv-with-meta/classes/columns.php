@@ -116,7 +116,7 @@ class ACUI_Columns{
 		$( '.reset_fields_profile' ).click( function( e ){
 			e.preventDefault();
 
-			var r = confirm( "<?php _e( 'Are you sure to reset all fields, it will delete current fields and they will restored in next import', 'import-users-from-csv-with-meta' ); ?>" );
+			var r = confirm( "<?php _e( 'Are you sure you want to reset all fields, it will delete current fields and they will be restored in the next import', 'import-users-from-csv-with-meta' ); ?>" );
 			
 			if( !r )
 				return;

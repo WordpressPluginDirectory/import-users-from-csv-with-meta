@@ -9,7 +9,7 @@ class ACUI_NewFeatures{
     <h3 class="hndle"><span>&nbsp;<?php _e( 'New features', 'import-users-from-csv-with-meta' ); ?></span></h3>
 
     <div class="inside" style="display: block;">
-        <p><?php _e( 'This is a list of new features that we want to include, but we have not been able to do yet. We have a bussiness and have not so much time for this plugin as we would like to have. If you need some new feature not included in this list, please write us to:', 'import-users-from-csv-with-meta' ); ?> <a href="mailto:contacto@codection.com">contacto@codection.com</a>. <?php _e( 'You can also donate us or talk with us to have some of the next new features done soon.', 'import-users-from-csv-with-meta' ); ?></p>
+        <p><?php _e( 'This is a list of new features that we want to include, but we have not been able to do so yet. We run a business and do not have as much time to devote to this plugin as we would like. If you need some new feature not included in this list, please write to us at:', 'import-users-from-csv-with-meta' ); ?></p>
         <ul style="list-style: disc; padding-left: 15px;">
             <li>Change required document format</li>
             <li>Make a wizard to help importing</li>

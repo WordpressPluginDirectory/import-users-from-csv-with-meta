@@ -78,7 +78,7 @@ class ACUI_WooCommerceSubscriptions{
 			<td>
 				<ol>
 					<li><?php _e( 'You can import subscriptions with their info', 'import-users-from-csv-with-meta' ); ?>.</li>
-					<li><?php printf( __( 'Data format: use the column names <a href="%s">described here</a>, except the ones that are not used because we have the own ones:', 'import-users-from-csv-with-meta' ), "https://github.com/woocommerce/woocommerce-subscriptions-importer-exporter#csv-columns" ); ?> customer_id, customer_email and customer_username.</li>
+					<li><?php printf( __( 'Data format: use the column names <a href="%s">described here</a>, except the ones unused because we have our own:', 'import-users-from-csv-with-meta' ), "https://github.com/woocommerce/woocommerce-subscriptions-importer-exporter#csv-columns" ); ?> customer_id, customer_email and customer_username.</li>
 					<li><?php printf( __( 'Download <a href="%s">this sample file</a> to see how it works', 'import-users-from-csv-with-meta' ), esc_url( plugins_url( 'samples/wcs-import-sample.csv', dirname( __FILE__ ) ) ) ); ?>.</li>
 					<li><?php printf( __( 'This subscription importer is based in the official <a href="%s">WooCommerce Subscription Importer Exporter</a>.', 'import-users-from-csv-with-meta' ), "https://github.com/woocommerce/woocommerce-subscriptions-importer-exporter" ); ?></li>
 				</ol>
@@ -320,7 +320,7 @@ class ACUI_WooCommerceSubscriptions{
 				}
 
 				if ( $set_manual ) {
-					$result['warning'][] = esc_html__( 'No payment method was given in CSV and so the subscription has been set to manual renewal.', 'import-users-from-csv-with-meta' );
+					$result['warning'][] = esc_html__( 'No payment method was given in the CSV and so the subscription has been set to manual renewal.', 'import-users-from-csv-with-meta' );
 				} else if ( $requires_manual_renewal ) {
 					$result['warning'][] = esc_html__( 'Import forced manual renewal.', 'import-users-from-csv-with-meta' );
 				}
@@ -377,10 +377,9 @@ class ACUI_WooCommerceSubscriptions{
 					}
 
 					if ( empty( $shipping_method ) ) {
-						$result['warning'][] = esc_html__( 'Shipping method and title for the subscription have been left as empty. ', 'import-users-from-csv-with-meta' );
+						$result['warning'][] = esc_html__( 'Shipping method and title for the subscription have been left empty.', 'import-users-from-csv-with-meta' );
 					}
 				}
-
 				
 				add_filter( 'woocommerce_can_subscription_be_updated_to_cancelled', '__return_true' );
 				add_filter( 'woocommerce_can_subscription_be_updated_to_pending-cancel', '__return_true' );
@@ -493,13 +492,13 @@ class ACUI_WooCommerceSubscriptions{
 					$subscription->set_payment_method( $payment_gateway, $payment_method_data );
 					$subscription->save();
 				} else {
-					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %1$s subscription (%2$s). The next renewal is going to fail if you leave this.', 'import-users-from-csv-with-meta' ), $payment_method, $subscription_id );
+					$warnings[] = sprintf( esc_html__( 'No payment meta was set for your %1$s subscription (%2$s). The next renewal is going to fail if you leave this as-is.', 'import-users-from-csv-with-meta' ), $payment_method, $subscription_id );
 				}
 			} else {
 				if ( 'paypal' == $payment_method ) {
-					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewals. Either PayPal was not enabled or your PayPal account does not have Reference Transaction setup. Learn more about enabling Reference Transactions %1$shere%2$s.', 'import-users-from-csv-with-meta' ), '<a href="https://support.woocommerce.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
+					$warnings[] = sprintf( esc_html__( 'Could not set payment method as PayPal, defaulted to manual renewal. Either PayPal was not enabled or your PayPal account does not have Reference Transaction set up. Learn more about enabling Reference Transactions %1$shere%2$s.', 'import-users-from-csv-with-meta' ), '<a href="https://support.woocommerce.com/hc/en-us/articles/205151193-PayPal-Reference-Transactions-for-Subscriptions">', '</a>' );
 				} else {
-					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewals.', 'import-users-from-csv-with-meta' ), $payment_method );
+					$warnings[] = sprintf( esc_html__( 'The payment method "%s" is either not enabled or does not support the new features of Subscriptions 2.0 and can not be properly attached to your subscription. This subscription has been set to manual renewal.', 'import-users-from-csv-with-meta' ), $payment_method );
 				}
 				$subscription->set_requires_manual_renewal( true );
 			}
@@ -573,7 +572,7 @@ class ACUI_WooCommerceSubscriptions{
 				$coupon_id =  $coupon_line_item->get_id();
 
 				if ( ! $coupon_id ) {
-					throw new Exception( sprintf( esc_html__( 'Coupon "%s" could not be added to subscription.', 'import-users-from-csv-with-meta' ), $coupon_code ) );
+					throw new Exception( sprintf( esc_html__( 'Coupon "%s" could not be added to the subscription.', 'import-users-from-csv-with-meta' ), $coupon_code ) );
 				}
 			}
 		}
@@ -584,7 +583,7 @@ class ACUI_WooCommerceSubscriptions{
 		$item_args['qty'] = isset( $data['quantity'] ) ? $data['quantity'] : 1;
 
 		if ( ! isset( $data['product_id'] ) ) {
-			throw new Exception( __( 'The product_id is missing from CSV.', 'import-users-from-csv-with-meta' ) );
+			throw new Exception( __( 'The product_id is missing from the CSV.', 'import-users-from-csv-with-meta' ) );
 		}
 
 		$_product = wc_get_product( $data['product_id'] );
@@ -649,7 +648,7 @@ class ACUI_WooCommerceSubscriptions{
 		}
 
 		if ( ! $item_id ) {
-			throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix up the data from your CSV and try again.', 'import-users-from-csv-with-meta' ) );
+			throw new Exception( __( 'An unexpected error occurred when trying to add product "%s" to your subscription. The error was caught and no subscription for this row will be created. Please fix the data from your CSV and try again.', 'import-users-from-csv-with-meta' ) );
 		}
 
 		if ( ! empty( $data[ 'download_permissions'] ) && ( 'true' == $data[ 'download_permissions'] || 1 == (int) $data[ 'download_permissions'] ) ) {
@@ -712,7 +711,7 @@ class ACUI_WooCommerceSubscriptions{
 				$fee_id = $fee_line_item->get_id();
 
 				if ( ! $fee_id ) {
-					throw new Exception( __( 'Could not add the fee to your subscription, the subscription has not been imported.', 'import-users-from-csv-with-meta' ) );
+					throw new Exception( __( 'Could not add the fee to your subscription. The subscription has not been imported.', 'import-users-from-csv-with-meta' ) );
 				}
 			}
 		}
@@ -761,7 +760,7 @@ class ACUI_WooCommerceSubscriptions{
 				$shipping_id = $shipping_line_item->get_id();
 
 				if ( ! $shipping_id ) {
-					throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription, a subscription not been created for this row.', 'import-users-from-csv-with-meta' ) );
+					throw new Exception( __( 'An error occurred when trying to add the shipping item to the subscription. A subscription has not been created for this row.', 'import-users-from-csv-with-meta' ) );
 				}
 
 				update_post_meta( $subscription->get_id(), '_shipping_method', $shipping_method );

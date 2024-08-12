@@ -10,22 +10,22 @@ class ACUI_Doc{
 		<tbody>
 			<tr valign="top">
 				<th scope="row"><?php _e( 'Columns position', 'import-users-from-csv-with-meta' ); ?></th>
-				<td><small><em><?php _e( '(Documents should look like the one presented into screenshot. Remember you should fill the first two columns with the next values)', 'import-users-from-csv-with-meta' ); ?></em></small>
+				<td><small><em><?php _e( '(Documents should look like the one presented in the screenshot. Remember to fill the first two columns with the next values)', 'import-users-from-csv-with-meta' ); ?></em></small>
 					<ol>
 						<li><?php _e( 'Username: you can leave it empty and the username will be generated randomly', 'import-users-from-csv-with-meta' ); ?> </li>
 						<li><?php _e( 'Email:', 'import-users-from-csv-with-meta' ); ?> <?php echo apply_filters( 'acui_documentation_email_message', sprintf( __( 'required, although you can use <a href="%s">this addon to allow users to be imported without an associated email address</a>.','import-users-from-csv-with-meta' ), 'https://import-wp.com/allow-no-email-addon/' ) ); ?></li>
 					</ol>						
-					<small><em><?php _e( '(The next columns are totally customizable and you can use whatever you want. All rows must contains same columns)', 'import-users-from-csv-with-meta' ); ?></em></small>
+					<small><em><?php _e( '(The next columns are totally customizable and you can use whatever you want. All rows must contains the same columns)', 'import-users-from-csv-with-meta' ); ?></em></small>
 					<small><em><?php _e( '(User profile will be adapted to the kind of data you have selected)', 'import-users-from-csv-with-meta' ); ?></em></small>
-					<small><em><?php _e( '(If you want to disable the extra profile information, please deactivate this plugin after make the import)', 'import-users-from-csv-with-meta' ); ?></em></small>
+					<small><em><?php _e( '(If you want to disable the extra profile information, please deactivate this plugin after making the import)', 'import-users-from-csv-with-meta' ); ?></em></small>
 				</td>
 			</tr>
 			<tr valign="top">
 				<th scope="row"><?php _e( 'id (column id)', 'import-users-from-csv-with-meta' ); ?></th>
 				<td><?php _e( 'You can use a column called id in order to make inserts or updates of an user using the ID used by WordPress in the wp_users table. We have two different cases:', 'import-users-from-csv-with-meta' ); ?>
 					<ul style="list-style:disc outside none; margin-left:2em;">
-						<li><?php _e( "If id <strong>doesn't exist in your users table</strong>: WordPress core does not allow us insert it, so it will throw an error of kind: invalid_user_id", 'import-users-from-csv-with-meta' ); ?></li>
-						<li><?php _e( "If id <strong>exists</strong>: plugin check if username is the same, if yes, it will update the data, if not, it ignores the cell to avoid problems", 'import-users-from-csv-with-meta' ); ?></li>
+						<li><?php _e( "If ID <strong>doesn't exist in your user table</strong>: WordPress core does not allow us to insert it, so it will throw an error of type: invalid_user_id", 'import-users-from-csv-with-meta' ); ?></li>
+						<li><?php _e( "If ID <strong>exists</strong>: the plugin checks if username is the same, if yes, it will update the data, if not, it ignores the cell to avoid problems.", 'import-users-from-csv-with-meta' ); ?></li>
 					</ul>
 				</td>
 			</tr>
@@ -33,8 +33,8 @@ class ACUI_Doc{
 				<th scope="row"><?php _e( "Passwords (column password and user_pass)", 'import-users-from-csv-with-meta' ); ?></th>
 				<td><?php _e( "A string that contains user passwords. We have different options for this case:", 'import-users-from-csv-with-meta' ); ?>
 					<ul style="list-style:disc outside none; margin-left:2em;">
-                        <li><?php _e( "If you <strong>create a column password</strong>: if cell is empty, password won't be updated; if cell has a value, it will be used.", 'import-users-from-csv-with-meta' ); ?></li>
-                        <li><?php _e( "If you <strong>create a column called user_pass</strong>: this will be a hashed password that will be inserted directly in database, this is the best option to move users with their passwords using export tool", 'import-users-from-csv-with-meta' ); ?></li>
+                        <li><?php _e( "If you <strong>create a password column</strong>: if cell is empty, password won't be updated; if cell has a value, it will be used.", 'import-users-from-csv-with-meta' ); ?></li>
+                        <li><?php _e( "If you <strong>create a column called user_pass</strong>, it will be a hashed password that will be inserted directly in the database. This is the best option to move users with their passwords using the export tool.", 'import-users-from-csv-with-meta' ); ?></li>
                         <li><?php _e( "If you <strong>don't create a column for passwords (nor user_pass nor password)</strong>: passwords will be generated automatically.", 'import-users-from-csv-with-meta' ); ?></li>
                         <li><?php _e( "You should not use both columns in the same import", 'import-users-from-csv-with-meta' ); ?></li>
 					</ul>
@@ -44,10 +44,10 @@ class ACUI_Doc{
 				<th scope="row"><?php _e( "Roles (column role)", 'import-users-from-csv-with-meta' ); ?></th>
 				<td><?php _e( "Plugin can import roles from the CSV. This is how it works:", 'import-users-from-csv-with-meta' ); ?>
 					<ul style="list-style:disc outside none; margin-left:2em;">
-						<li><?php _e( "If you <strong>don't create a column for roles</strong>: roles would be chosen from the 'Default role' field in import screen.", 'import-users-from-csv-with-meta' ); ?></li>
-						<li><?php _e( "If you <strong>create a column called 'role'</strong>: if cell is empty, roles would be chosen from 'Default role' field in import screen; if cell has a value, it will be used as role, if this role doesn't exist the default one would be used", 'import-users-from-csv-with-meta' ); ?></li>
+						<li><?php _e( "If you <strong>don't create a column for roles</strong>: roles will be chosen from the 'Default role' field in import screen.", 'import-users-from-csv-with-meta' ); ?></li>
+						<li><?php _e( "If you <strong>create a column called 'role'</strong>: if the cell is empty, roles will be chosen from 'Default role' field in import screen; if the cell has a value, it will be used as role, if this role doesn't exist the default one would be used", 'import-users-from-csv-with-meta' ); ?></li>
 						<li><?php _e( "Multiple roles can be imported creating <strong>a list of roles</strong> using commas to separate values.", 'import-users-from-csv-with-meta' ); ?></li>
-						<li><?php _e( "If you choose <strong>no role</strong> checkbox or write <strong>no_role</strong> in the column role, the users created or updated won't have any role assigned.", 'import-users-from-csv-with-meta' ); ?></li>
+						<li><?php _e( "If you choose <strong>no role</strong> checkbox or write <strong>no_role</strong> in the column role, the user created or updated won't have any role assigned.", 'import-users-from-csv-with-meta' ); ?></li>
 					</ul>
 					<em><?php _e( "Notice: If the default new role is administrator in WordPress settings, role will not be set during a CSV file import with this plugin. Check it if all users are being imported as administrators and you have set another role in this plugin.", 'import-users-from-csv-with-meta' ); ?></em>
 				</td>
@@ -59,12 +59,12 @@ class ACUI_Doc{
 			</tr>
 			<tr valign="top">
 				<th scope="row"><?php _e( "Lists", 'import-users-from-csv-with-meta' ); ?></th>
-				<td><?php _e( "Plugin can import lists an array. Use this separator:", 'import-users-from-csv-with-meta'); ?> <strong>::</strong> <?php _e("two colons, inside the cell in order to split the string in a list of items.", 'import-users-from-csv-with-meta' ); ?>
+				<td><?php _e( "Plugin can import lists as an array. Use this separator:", 'import-users-from-csv-with-meta'); ?> <strong>::</strong> <?php _e("two colons, inside the cell in order to split the string in a list of items.", 'import-users-from-csv-with-meta' ); ?>
 				</td>
 			</tr>
             <tr valign="top">
 				<th scope="row"><?php _e( "Arrays with string keys", 'import-users-from-csv-with-meta' ); ?></th>
-				<td><?php _e( "Plugin can also import arrays with string keys. Use this separator:", 'import-users-from-csv-with-meta'); ?> <strong>::</strong> <?php _e("two colons, inside the cell in order to split the string in a list of items. Every item should be splitted using => to separate the key from the value. For example: ", 'import-users-from-csv-with-meta' ); ?>key1=>value1::key2=>value2::key3=>value3
+				<td><?php _e( "Plugin can also import arrays with string keys. Use this separator:", 'import-users-from-csv-with-meta'); ?> <strong>::</strong> <?php _e("two colons, inside the cell, in order to split the string in a list of items. Every item should be split using => to separate the key from the value. For example:", 'import-users-from-csv-with-meta' ); ?> key1=>value1::key2=>value2::key3=>value3
 				</td>
 			</tr>
 			<tr valign="top" id="force_user_reset_password">
@@ -72,11 +72,11 @@ class ACUI_Doc{
 				<td>
 					<ul style="list-style:disc outside none; margin-left:2em;">
 						<li><?php _e( "This option will force users to go to their edit password screen after being created with this plugin. As this is an option that deals with profile screens and password edit actions that can change, <strong>you should be careful if you use a plugin to modify any of these functions</strong>.", 'import-users-from-csv-with-meta'); ?></li>
-						<li><?php _e( "We <strong>support the standard WordPress method and WooCommerce</strong> but if you use other plugins that modify these views or actions you may have problems with infinite redirection loops with users who have this option checked.", 'import-users-from-csv-with-meta'); ?></li>
-						<li><?php _e( "If you have this redirection problem, you can delete the metadata that forces you to change the password and causes the redirection loop problem for all users using the following button:", 'import-users-from-csv-with-meta'); ?></li>
+						<li><?php _e( "We <strong>support the standard WordPress method and WooCommerce</strong>. But if you use other plugins that modify these views or actions, you may have problems with infinite redirection loops with users who have this option checked.", 'import-users-from-csv-with-meta'); ?></li>
+						<li><?php _e( "If you suffer from this redirection loop problem, apart from not using this option again, you can solve the problem for users already created by deleting the metadata that controls this action. Just use the following button to do so:", 'import-users-from-csv-with-meta'); ?></li>
 					</ul>
 
-					<input type="button" id="delete_all_metadata_forcing_password_change" class="button button-primary" value="<?php _e( 'Delete all metadata forcing password change for all users', 'import-users-from-csv-with-meta' ); ?>">
+					<input type="button" id="delete_all_metadata_forcing_password_change" class="button button-primary" value="<?php _e( 'Delete all metadata that would force a password change for all users', 'import-users-from-csv-with-meta' ); ?>">
 				</td>
 			</tr>
 			<tr valign="top">
@@ -100,13 +100,13 @@ class ACUI_Doc{
 
 			<tr valign="top">
 				<th scope="row"><?php _e( 'Cron', 'import-users-from-csv-with-meta' ); ?></th>
-			<td><?php _e( 'Cron tab allows you to make periodical imports using the WordPress cron scheduler.','import-users-from-csv-with-meta'); ?></td>
+			<td><?php _e( 'CronThe Cron tab allows you to make periodic imports using the WordPress cron scheduler.','import-users-from-csv-with-meta'); ?></td>
 			</tr>
 
 			<?php do_action( 'acui_documentation_after_plugins_activated' ); ?>
 			
 			<tr valign="top">
-				<th scope="row"><?php _e( "Any question about it", 'import-users-from-csv-with-meta' ); ?></th>
+				<th scope="row"><?php _e( "Any question about it?", 'import-users-from-csv-with-meta' ); ?></th>
 				<td>
 					<ul style="list-style:disc outside none; margin-left:2em;">
 						<li><?php _e( 'Free support (in WordPress forums):', 'import-users-from-csv-with-meta' ); ?> <a href="https://wordpress.org/support/plugin/import-users-from-csv-with-meta">https://wordpress.org/support/plugin/import-users-from-csv-with-meta</a>.</li>
@@ -117,7 +117,7 @@ class ACUI_Doc{
 
 			<tr valign="top">
 				<th scope="row"><?php _e( 'Hooks', 'import-users-from-csv-with-meta' ); ?></th>
-			<td><?php _e( 'If you are a developer you can extend or use this plugin with all the hooks we provide, you have <a href="https://codection.com/import-users-csv-meta/listado-de-hooks-de-import-and-exports-users-and-customers/">a list of them here</a>','import-users-from-csv-with-meta'); ?></td>
+				<td><?php _e( 'If you are a developer, you can extend or use this plugin with all the hooks we provide, you have <a href=\"https://codection.com/import-users-csv-meta/listado-de-hooks-de-import-and-exports-users-and-customers/\">a list of them here</a>','import-users-from-csv-with-meta'); ?></td>
 			</tr>
 
 			<tr valign="top">

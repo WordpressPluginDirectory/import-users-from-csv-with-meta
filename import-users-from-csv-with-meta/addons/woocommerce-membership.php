@@ -20,8 +20,8 @@ function acui_wm_documentation_after_plugins_activated(){
 		<th scope="row"><?php _e( "WooCommerce Memberships is activated", 'import-users-from-csv-with-meta' ); ?></th>
 		<td>
 			<ol>
-				<li><strong><?php _e( "Import all membership information", 'import-users-from-csv-with-meta' ); ?></strong>: <?php _e( "You can use the <strong>columns in the CSV format created by WooCommercer Membership</strong> in order to import data from this plugin.", 'import-users-from-csv-with-meta' ); ?>. <a href="https://docs.woocommerce.com/document/woocommerce-memberships-import-and-export/"><?php _e( "Read more about columns and formats", 'import-users-from-csv-with-meta' ); ?></a>.</li>
-				<li><strong><?php _e( "Add users to membership plans", 'import-users-from-csv-with-meta' ); ?></strong>: <?php _e( "In this case you will only have to use <strong>membership_plan_id</strong> column in order to associate a user to their membership plan", 'import-users-from-csv-with-meta' ); ?>.</li>
+				<li><strong><?php _e( "Import all membership information", 'import-users-from-csv-with-meta' ); ?></strong>: <?php _e( "You can use the <strong>columns in the CSV format created by WooCommerce Membership</strong> in order to import data from this plugin", 'import-users-from-csv-with-meta' ); ?>. <a href="https://docs.woocommerce.com/document/woocommerce-memberships-import-and-export/"><?php _e( "Read more about columns and formats", 'import-users-from-csv-with-meta' ); ?></a>.</li>
+				<li><strong><?php _e( "Add users to membership plans", 'import-users-from-csv-with-meta' ); ?></strong>: <?php _e( "In this case you will only have to use the <strong>membership_plan_id</strong> column in order to associate a user to their membership plan", 'import-users-from-csv-with-meta' ); ?>.</li>
 			</ol>
 		</td>
 	</tr>

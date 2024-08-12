@@ -9,7 +9,7 @@ class ACUI_WP_Importer_GUI{
 	}
 
 	function register(){
-		register_importer( 'acui_importer', __( 'Import users or customers (CSV)', 'import-users-from-csv-with-meta' ), __( 'Import <strong>users or customers</strong> to your site via a csv file.', 'import-users-from-csv-with-meta' ), array( $this, 'importer' ) );
+		register_importer( 'acui_importer', __( 'Import users or customers (CSV)', 'import-users-from-csv-with-meta' ), __( 'Import <strong>users or customers</strong> to your site via a CSV file.', 'import-users-from-csv-with-meta' ), array( $this, 'importer' ) );
 	}
 
 	function importer(){
@@ -43,4 +43,5 @@ class ACUI_WP_Importer_GUI{
 		<?php
 	}
 }
+
 new ACUI_WP_Importer_GUI();

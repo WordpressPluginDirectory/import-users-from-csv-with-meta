@@ -1,5 +1,4 @@
 <?php
-
 if ( ! defined( 'ABSPATH' ) ) exit; 
 
 class ACUI_Email_Template{
@@ -42,7 +41,7 @@ class ACUI_Email_Template{
 			'use_featured_image'    => __( 'Use as featured image', 'import-users-from-csv-with-meta' ),
 			'insert_into_item'      => __( 'Insert into email template', 'import-users-from-csv-with-meta' ),
 			'uploaded_to_this_item' => __( 'Uploaded to this email template', 'import-users-from-csv-with-meta' ),
-			'items_list'            => __( 'Items list', 'import-users-from-csv-with-meta' ),
+			'items_list'            => __( 'Item list', 'import-users-from-csv-with-meta' ),
 			'items_list_navigation' => __( 'Email template list navigation', 'import-users-from-csv-with-meta' ),
 			'filter_items_list'     => __( 'Filter email template list', 'import-users-from-csv-with-meta' ),
 		);
@@ -78,11 +77,11 @@ class ACUI_Email_Template{
 		<li>**username** = <?php _e( 'username to login', 'import-users-from-csv-with-meta' ); ?></li>
 		<li>**password** = <?php _e( 'user password', 'import-users-from-csv-with-meta' ); ?></li>
 		<li>**email** = <?php _e( 'user email', 'import-users-from-csv-with-meta' ); ?></li>
-		<li>**loginurl** = <?php _e( 'current site login url', 'import-users-from-csv-with-meta' ); ?></li>
-		<li>**lostpasswordurl** = <?php _e( 'lost password url', 'import-users-from-csv-with-meta' ); ?></li>
-		<li>**passwordreseturl** = <?php _e( 'password reset url', 'import-users-from-csv-with-meta' ); ?></li>
-		<li>**passwordreseturllink** = <?php _e( 'password reset url with HTML link', 'import-users-from-csv-with-meta' ); ?></li>
-		<li><?php _e( "You can also use any WordPress user standard field or an own metadata, if you have used it in your CSV. For example, if you have a first_name column, you could use **first_name** or any other meta_data like **my_custom_meta**", 'import-users-from-csv-with-meta' ) ;?></li>
+		<li>**loginurl** = <?php _e( 'current site login URL', 'import-users-from-csv-with-meta' ); ?></li>
+		<li>**lostpasswordurl** = <?php _e( 'lost password URL', 'import-users-from-csv-with-meta' ); ?></li>
+		<li>**passwordreseturl** = <?php _e( 'password reset URL', 'import-users-from-csv-with-meta' ); ?></li>
+		<li>**passwordreseturllink** = <?php _e( 'password reset URL with HTML link', 'import-users-from-csv-with-meta' ); ?></li>
+		<li><?php _e( "You can also use any WordPress user standard field or its own metadata, if you have used it in your CSV. For example, if you have a first_name column, you could use **first_name** or any other meta_data like **my_custom_meta**", 'import-users-from-csv-with-meta' ) ;?></li>
 		<?php do_action( 'acui_email_wildcards_list_elements' ); ?>
 	</ul>
 		<?php

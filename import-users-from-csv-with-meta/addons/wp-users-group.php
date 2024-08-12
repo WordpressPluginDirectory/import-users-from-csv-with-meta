@@ -19,7 +19,7 @@ function acui_wpug_documentation_after_plugins_activated(){
 	<tr valign="top">
 		<th scope="row"><?php _e( "WP Users Group is activated", 'import-users-from-csv-with-meta' ); ?></th>
 		<td>
-			<?php _e( "You can import user groups and assign them to the users using the next format", 'import-users-from-csv-with-meta' ); ?>.
+			<?php _e( "You can import user groups and assign them to users using the following format", 'import-users-from-csv-with-meta' ); ?>.
 			<ul style="list-style:disc outside none; margin-left:2em;">
 				<li><?php _e( "user_group as the column title", 'import-users-from-csv-with-meta' ); ?></li>
 				<li><?php _e( "The value of each cell will be the name of the user group (do not use slugs)", 'import-users-from-csv-with-meta' ); ?></li>

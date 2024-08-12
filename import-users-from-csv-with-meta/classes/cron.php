@@ -203,14 +203,14 @@ class ACUI_Cron{
 				<tbody>
 
 				<tr class="form-field form-required">
-					<th scope="row"><label for="cron-activated"><?php _e( 'Activate periodical import?', 'import-users-from-csv-with-meta' ); ?></label></th>
+					<th scope="row"><label for="cron-activated"><?php _e( 'Activate periodic import?', 'import-users-from-csv-with-meta' ); ?></label></th>
 					<td>
                         <?php ACUIHTML()->checkbox( array( 'name' => 'cron-activated', 'compare_value' => $cron_activated ) ); ?>
 					</td>
 				</tr>
 
 				<tr class="form-field">
-					<th scope="row"><label for="path_to_file"><?php _e( "Path or URL of file that are going to be imported", 'import-users-from-csv-with-meta' ); ?></label></th>
+					<th scope="row"><label for="path_to_file"><?php _e( "Path or URL of file that is going to be imported", 'import-users-from-csv-with-meta' ); ?></label></th>
 					<td>
                         <?php ACUIHTML()->text( array( 'name' => 'path_to_file', 'value' => $path_to_file, 'class' => '', 'placeholder' => __( 'Insert complete path to the file', 'import-users-from-csv-with-meta' ) ) ); ?>
 						<p class="description"><?php printf( __( 'You have to enter the URL or the path to the file, i.e.: %s or %s' ,'import-users-from-csv-with-meta' ), $sample_path, $sample_url ); ?></p>
@@ -227,12 +227,12 @@ class ACUI_Cron{
                             'show_option_all' => false,
                             'show_option_none' => false,
                         )); ?>
-						<p class="description"><?php _e( 'How often the event should reoccur?', 'import-users-from-csv-with-meta' ); ?></p>
+						<p class="description"><?php _e( 'How often should the event reoccur?', 'import-users-from-csv-with-meta' ); ?></p>
 					</td>
 				</tr>
 
 				<tr class="form-field form-required">
-					<th scope="row"><label for="send-mail-cron"><?php _e( 'Send mail when using periodical import?', 'import-users-from-csv-with-meta' ); ?></label></th>
+					<th scope="row"><label for="send-mail-cron"><?php _e( 'Send email when using periodic import?', 'import-users-from-csv-with-meta' ); ?></label></th>
 					<td>
                         <?php ACUIHTML()->checkbox( array( 'name' => 'send-mail-cron', 'compare_value' => $send_mail_cron ) ); ?>
 					</td>
@@ -255,7 +255,7 @@ class ACUI_Cron{
                             'show_option_all' => false,
                             'show_option_none' => __( 'Disable role assignment in cron import', 'import-users-from-csv-with-meta' ),
                         )); ?>
-						<p class="description"><?php _e( 'Which role would be used to import users?', 'import-users-from-csv-with-meta' ); ?></p>
+						<p class="description"><?php _e( 'Which role will be used to import users?', 'import-users-from-csv-with-meta' ); ?></p>
 					</td>
 				</tr>
 
@@ -275,7 +275,7 @@ class ACUI_Cron{
 
 						<div class="move-file-cron-cell" style="margin-left:25px;">
                             <?php ACUIHTML()->text( array( 'name' => 'path_to_move', 'value' => $path_to_move, 'class' => '', 'placeholder' => __( 'Insert complete path to the file', 'import-users-from-csv-with-meta' ) ) ); ?>
-							<p class="description"><?php _e( 'You have to introduce the path to file, i.e.:', 'import-users-from-csv-with-meta'); ?> <?php $upload_dir = wp_upload_dir(); echo $upload_dir["path"]; ?>/move.csv</p>
+							<p class="description"><?php _e( 'You have to enter the path to file, i.e.:', 'import-users-from-csv-with-meta'); ?> <?php $upload_dir = wp_upload_dir(); echo $upload_dir["path"]; ?>/move.csv</p>
 						</div>
 					</td>
 				</tr>
@@ -316,7 +316,7 @@ class ACUI_Cron{
                                 'show_option_none' => __( 'Delete posts of deleted users without assigning to any user', 'import-users-from-csv-with-meta' ),
                             )); ?>
 							</select>
-							<p class="description"><?php _e( 'Administrators will not be deleted anyway. After delete users, we can choose if we want to assign their posts to another user. If you do not choose some user, content will be deleted.', 'import-users-from-csv-with-meta' ); ?></p>
+							<p class="description"><?php _e( 'Administrators will not be deleted anyway. After deleting users, you can choose if you want to assign their posts to another user. If you do not choose a user, their content will be deleted.', 'import-users-from-csv-with-meta' ); ?></p>
 						</div>
 					</td>
 				</tr>
@@ -335,7 +335,7 @@ class ACUI_Cron{
                                 'show_option_all' => false,
                                 'show_option_none' => false,
                             )); ?>
-							<p class="description"><?php _e( 'After import users which is not present in the CSV and can be changed to a different role.', 'import-users-from-csv-with-meta' ); ?></p>
+							<p class="description"><?php _e( 'After importing users from a CSV, users not present in the CSV can have their roles changed to a different role.', 'import-users-from-csv-with-meta' ); ?></p>
 						</div>
 					</td>
 				</tr>
@@ -349,8 +349,8 @@ class ACUI_Cron{
 				<tr class="form-field form-required">
 					<th scope="row"><label for="log"><?php _e( 'GET endpoint to execute cron', 'import-users-from-csv-with-meta' ); ?></label></th>
 					<td>
-						<?php _e( 'You can execute the cron process out of your site using the next REST-API endpoint:', 'import-users-from-csv-with-meta' ); ?> <a href="<?php echo $rest_api_execute_cron_url; ?>"><?php echo $rest_api_execute_cron_url; ?></a>.<br/>
-						<p class="description"><?php _e( 'This endpoint does an administrative task, so in order to run it you must be authenticated with a user with privileges.', 'import-users-from-csv-with-meta' ); ?></p>
+						<?php _e( 'You can execute the cron process outside of your site using the next REST-API endpoint:', 'import-users-from-csv-with-meta' ); ?> <a href="<?php echo $rest_api_execute_cron_url; ?>"><?php echo $rest_api_execute_cron_url; ?></a>.<br/>
+						<p class="description"><?php _e( 'This endpoint does an administrative task, so in order to run it you must be authenticated as a user with privileges.', 'import-users-from-csv-with-meta' ); ?></p>
 					</td>
 				</tr>				
 				</tbody>
@@ -420,7 +420,7 @@ class ACUI_Cron{
 
 			$( "[name='cron-delete-users']" ).change(function() {
 		        if( $ (this ).is( ":checked" ) ) {
-		            var returnVal = confirm("<?php _e( 'Are you sure to delete all users that are not present in the CSV? This action cannot be undone.', 'import-users-from-csv-with-meta' ); ?>");
+		            var returnVal = confirm("<?php _e( 'Are you sure you want to delete all users that are not present in the CSV? This action cannot be undone.', 'import-users-from-csv-with-meta' ); ?>");
 		            $( this ).prop( "checked", returnVal );
 		        }
 		    });

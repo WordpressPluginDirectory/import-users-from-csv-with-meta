@@ -1,5 +1,4 @@
 <?php
-
 if ( ! defined( 'ABSPATH' ) ) exit; 
 
 if( !is_plugin_active( 'melapress-login-security/melapress-login-security.php' ) ){
@@ -21,7 +20,7 @@ class ACUI_MelapressLoginSecurity{
 		<tr valign="top">
 			<th scope="row"><?php _e( "MelaPress Login Security is activated", 'import-users-from-csv-with-meta' ); ?></th>
 			<td>
-				<?php _e( "This security plugin allows you to force a password reset for users at the first login. If you have this plugin option enabled, users registered through an import will behave in the same way as manually registered users, i.e. they will be prompted to reset their password on first login using the same method as if they had been added manually", 'import-users-from-csv-with-meta' ); ?>.
+				<?php _e( "This security plugin allows you to force a password reset for users at first login. If you have this plugin option enabled, users registered through an import will behave the same way as manually registered users, i.e. they will be prompted to reset their password on first login using the same method as if they had been added manually", 'import-users-from-csv-with-meta' ); ?>.
 			</td>
 		</tr>
 		<?php

@@ -1,5 +1,4 @@
 <?php
-
 class ACUI_Import{
     function __construct(){
     }
@@ -195,11 +194,11 @@ class ACUI_Import{
                 require_once ABSPATH . 'wp-admin/includes/file.php';
             }
 
-            $is_google_sheet_export_csv = strpos( $path_to_file, 'docs.google.com/spreadsheets' ) && strpos( $path_to_file, 'output=csv' );
+            $is_google_sheet_export_csv = ( strpos( $path_to_file, 'docs.google.com/spreadsheets' ) && strpos( $path_to_file, 'output=csv' ) ) || ( strpos( $path_to_file, 'drive.google.com' ) && strpos( $path_to_file, 'export=download' ) );
 
             if( pathinfo( $path_to_file, PATHINFO_EXTENSION ) != 'csv' && !$is_google_sheet_export_csv ){
                 echo "<p>" . __( 'Error, the file is not a CSV', 'import-users-from-csv-with-meta' ) . "</p>";
-                return;
+                return false;
             }
 
             $path_to_file = download_url( $path_to_file );
@@ -215,6 +214,7 @@ class ACUI_Import{
 
     function manage_file_upload( $path_to_file ){
         $path_to_file = wp_normalize_path( $path_to_file );
+        var_dump( $path_to_file );
         $path_to_file = $this->try_download_file( $path_to_file );
         
         if( validate_file( $path_to_file ) !== 0 ){
@@ -222,8 +222,8 @@ class ACUI_Import{
             echo sprintf( __( 'Reload or try <a href="%s">a new import here</a>', 'import-users-from-csv-with-meta' ), get_admin_url( null, 'tools.php?page=acui&tab=homepage' ) );
             return false;
         } 
-        elseif( !file_exists ( $path_to_file ) ){
-            echo "<p>" . __( 'Error, we cannot find the file', 'import-users-from-csv-with-meta' ) . ": $path_to_file</p>";
+        elseif( empty( $path_to_file ) || !file_exists ( $path_to_file ) ){
+            echo "<p>" . __( 'Error, the file cannot be found', 'import-users-from-csv-with-meta' ) . ": $path_to_file</p>";
             echo sprintf( __( 'Reload or try <a href="%s">a new import here</a>', 'import-users-from-csv-with-meta' ), get_admin_url( null, 'tools.php?page=acui&tab=homepage' ) );
             return false;
         }
@@ -349,7 +349,7 @@ class ACUI_Import{
                 if( is_array( $role ) && empty( $role[0] ) )
                     $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'If you are upgrading roles, you must choose at least one role', 'import-users-from-csv-with-meta' ), implode( ', ', $role ) ) );
                 else
-                    $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'Some of the next roles "%s" does not exists', 'import-users-from-csv-with-meta' ), implode( ', ', $role ) ) );
+                    $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'Some of the next roles "%s" do not exists', 'import-users-from-csv-with-meta' ), implode( ', ', $role ) ) );
                 
                 return array( 'result' => 'ignored', 'user_id' => $user_id );
             }
@@ -362,12 +362,12 @@ class ACUI_Import{
 
         if( !empty( $email ) && ( ( sanitize_email( $email ) == '' ) ) ){ // if email is invalid
             $errors[] = ACUIHelper()->new_error( $row,  sprintf( __( 'Invalid email "%s"', 'import-users-from-csv-with-meta' ), $email ) );
-            $data[0] = __('Invalid EMail','import-users-from-csv-with-meta')." ($email)";
+            $data[0] = __('Invalid email','import-users-from-csv-with-meta')." ($email)";
             return array( 'result' => 'ignored', 'user_id' => $user_id );
         }
         elseif( empty( $email ) ) {
             $errors[] = ACUIHelper()->new_error( $row,  __( 'Email not specified', 'import-users-from-csv-with-meta' ) );
-            $data[0] = __( 'EMail not specified', 'import-users-from-csv-with-meta' );
+            $data[0] = __( 'Email not specified', 'import-users-from-csv-with-meta' );
             return array( 'result' => 'ignored', 'user_id' => $user_id );
         }
 
@@ -443,7 +443,7 @@ class ACUI_Import{
             
             $new_user_id = ACUIHelper()->maybe_update_email( $user_id, $email, $password, $settings['update_emails_existing_users'], $original_email );
             if( empty( $new_user_id ) ){
-                $errors[] = ACUIHelper()->new_error( $row,  sprintf( __( 'User with email "%s" exists with other username, we ignore it', 'import-users-from-csv-with-meta' ), $email ), 'notice' );     
+                $errors[] = ACUIHelper()->new_error( $row,  sprintf( __( 'User with email "%s" exists with other username, it will be ignored', 'import-users-from-csv-with-meta' ), $email ), 'notice' );     
                 return array( 'result' => 'ignored', 'user_id' => $new_user_id );
             }
             
@@ -471,7 +471,7 @@ class ACUI_Import{
             $user_object = get_user_by( "email", $email );
             $user_id = $user_object->ID;
             
-            $data[0] = sprintf( __( 'User already exists as: %s (in this CSV file is called: %s)', 'import-users-from-csv-with-meta' ), $user_object->user_login, $username );
+            $data[0] = sprintf( __( 'User already exists as: %s (in this CSV file, it is called: %s)', 'import-users-from-csv-with-meta' ), $user_object->user_login, $username );
             $errors[] = ACUIHelper()->new_error( $row, $data[0], 'warning' );
 
             if( $password !== "" && $settings['update_allow_update_passwords'] == 'yes' ){
@@ -502,7 +502,7 @@ class ACUI_Import{
         }
         
         if( is_wp_error( $user_id ) ){ // in case the user is generating errors after this checks
-            $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'Problems with user: "%s" does not exists, error: %s', 'import-users-from-csv-with-meta' ), $username, $user_id->get_error_message() ) );
+            $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'Problems with user: "%s" does not exist, error: %s', 'import-users-from-csv-with-meta' ), $username, $user_id->get_error_message() ) );
             return array( 'result' => 'ignored', 'user_id' => 0 );
         }
 
@@ -652,7 +652,7 @@ class ACUI_Import{
             ( $created ) ? do_action( 'register_new_user', $user_id ) : do_action( 'edit_user_created_user', $user_id, 'both' );
         }
             
-        // send mail
+        // send email
         $mail_for_this_user = apply_filters( 'acui_send_email_for_user', $mail_for_this_user, $headers, $data, $user_id, $role, $positions, $form_data, $is_frontend, $is_cron, $password_changed );
 
         if( isset( $mail_for_this_user ) && $mail_for_this_user ){
@@ -778,7 +778,7 @@ class ACUI_Import{
             echo '<h2>' . apply_filters( 'acui_log_main_title', __('Importing users','import-users-from-csv-with-meta') ) . '</h2>';
 
             echo apply_filters( "acui_log_header", "<h3>" . __('Ready to registers','import-users-from-csv-with-meta') . "</h3>" );
-            echo apply_filters( "acui_log_header_first_row_explanation", "<p>" . __('First row represents the form of sheet','import-users-from-csv-with-meta') . "</p>" );
+            echo apply_filters( "acui_log_header_first_row_explanation", "<p>" . __('First row represents the format of the sheet','import-users-from-csv-with-meta') . "</p>" );
         }       
 
         $manager = new SplFileObject( $file );
@@ -795,7 +795,7 @@ class ACUI_Import{
                 break;
             }
             elseif( !is_array( $data ) ){
-                echo apply_filters( 'acui_message_csv_file_bad_formed', __( 'CSV file seems to be bad formed. Please use LibreOffice to create and manage CSV to be sure the format is correct', 'import-users-from-csv-with-meta') );
+                echo apply_filters( 'acui_message_csv_file_bad_formed', __( 'CSV file seems to be badly formed. Please use LibreOffice to create and manage a CSV to be sure the format is correct', 'import-users-from-csv-with-meta') );
                 break;
             }
 
@@ -809,7 +809,7 @@ class ACUI_Import{
                 $this->prepare_array_of_data( $data );
 
                 if( count( $data ) != $columns ):
-                    $errors[] = ACUIHelper()->new_error( $row, __( 'Row does not have the same columns than the header, we are going to ignore this row', 'import-users-from-csv-with-meta') );
+                    $errors[] = ACUIHelper()->new_error( $row, __( 'Row does not have the same columns as the header, we are going to ignore this row', 'import-users-from-csv-with-meta') );
                     continue;
                 endif;
 

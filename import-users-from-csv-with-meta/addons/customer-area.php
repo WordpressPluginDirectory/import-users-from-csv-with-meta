@@ -22,7 +22,7 @@ class ACUI_CustomerArea{
 		<tr valign="top">
 			<th scope="row"><?php _e( "WP Customer Area Managed Groups is activated", 'import-users-from-csv-with-meta' ); ?></th>
 			<td>
-				<?php _e( "You can import user groups and assign them to the users using the next format", 'import-users-from-csv-with-meta' ); ?>.
+				<?php _e( "You can import user groups and assign them to users using the following format", 'import-users-from-csv-with-meta' ); ?>.
 				<ul style="list-style:disc outside none; margin-left:2em;">
 					<li><?php _e( "customer_area_groups as the column title", 'import-users-from-csv-with-meta' ); ?></li>
 					<li><?php _e( "The value of each cell will be the slug of the group", 'import-users-from-csv-with-meta' ); ?></li>

@@ -640,7 +640,11 @@ class ACUI_Batch_Exporter{
 			return implode( ',', ACUIHelper()->get_roles_by_user_id( $user ) );
 		}
 
-		if( ( is_array( $value ) || is_array( @unserialize( $value, array( 'allowed_classes' => false ) ) ) ) && $this->get_display_arrays_as_comma_separated_list_of_values() ){
+		if( 
+			( is_array( $value ) || ( is_string( $value ) && is_array( @unserialize( $value, array( 'allowed_classes' => false ) ) ) ) ) 
+			&& 
+			$this->get_display_arrays_as_comma_separated_list_of_values() 
+		){
 			$value_array = is_serialized( $value ) ? unserialize( $value, array( 'allowed_classes' => false ) ) : $value;
 
 			if( ACUIHelper()->array_one_dimension( $value_array ) && ACUIHelper()->array_correlative_index( $value_array ) && !ACUIHelper()->array_contains_wp_error( $value_array ) ){
