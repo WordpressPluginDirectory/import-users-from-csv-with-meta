@@ -508,7 +508,18 @@ class ACUI_Helper{
         </style>
         <?php
     }
-
+    
+    function remove_specific_html_tags( $input, $tags_to_remove ){
+        $tags_pattern = [];
+        foreach ( $tags_to_remove as $tag ){
+            $tags_pattern[] = sprintf( '#<%s.*?>.*?</%s>#is', preg_quote( $tag, '#' ), preg_quote( $tag, '#' ) );
+            $tags_pattern[] = sprintf( '#<%s.*?/>#is', preg_quote( $tag, '#' ) );
+        }
+    
+        $output = preg_replace( $tags_pattern, '', $input );
+        return $output;
+    }
+    
     static function get_array_from_cell( $value ){
         if( strpos( $value, "=>" ) === false )
             return explode( "::", $value );

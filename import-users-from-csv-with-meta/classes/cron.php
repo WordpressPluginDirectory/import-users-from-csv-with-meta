@@ -69,7 +69,7 @@ class ACUI_Cron{
 
 		$form_data = array();
 		$form_data[ "path_to_file" ] = $this->clean_path_url_csv( get_option( "acui_cron_path_to_file") );
-		$form_data[ "role" ] = get_option( "acui_cron_role");
+		$form_data[ "role" ] = get_option( "acui_cron_role" );
 		$form_data[ "update_roles_existing_users" ] = ( get_option( "acui_cron_update_roles_existing_users" ) ) ? 'yes' : 'no';
 		$form_data[ "empty_cell_action" ] = "leave";
 		$form_data[ "allow_update_emails" ] = "disallow";
@@ -196,6 +196,13 @@ class ACUI_Cron{
 		if( empty( $allow_multiple_accounts ) )
 			$allow_multiple_accounts = "not_allowed";
 		?>
+		<style>
+		tr.log div.error,
+		tr.log div.notice{
+			display: none;
+		}
+		</style>
+
 		<h2><?php _e( "Execute an import of users periodically", 'import-users-from-csv-with-meta' ); ?></h2>
 
 		<form method="POST" enctype="multipart/form-data" action="" accept-charset="utf-8">
@@ -365,10 +372,10 @@ class ACUI_Cron{
 
 			<table class="form-table">
 				<tbody>
-				<tr class="form-field form-required">
+				<tr class="form-field form-required log">
 					<th scope="row"><label for="log"><?php _e( 'Last actions of schedule task', 'import-users-from-csv-with-meta' ); ?></label></th>
 					<td>
-						<pre><?php echo strip_tags( $log, '<br><div><p><strong><style><h2><h3><table><tbody><tr><td><th>' ); ?></pre>
+						<?php echo ACUIHelper()->remove_specific_html_tags( $log, array( 'script', 'style' ) ); ?>
 					</td>
 				</tr>
 				

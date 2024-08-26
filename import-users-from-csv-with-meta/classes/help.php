@@ -31,7 +31,7 @@ class ACUI_Help{
 </div>
 
 <div class="postbox">
-    <h3 class="hndle"><span>&nbsp;<?php _e( 'Need proffessional help with WordPress or WooCommerce?', 'import-users-from-csv-with-meta' ); ?></span></h3>
+    <h3 class="hndle"><span>&nbsp;<?php _e( 'Need professional help with WordPress or WooCommerce?', 'import-users-from-csv-with-meta' ); ?></span></h3>
 
     <div class="inside" style="display: block;">
         <p><?php _e( 'Hi! we are', 'import-users-from-csv-with-meta' ); ?> <a href="https://twitter.com/fjcarazo" target="_blank" title="Javier Carazo">Javier Carazo</a> <?php _e( 'and the team of', 'import-users-from-csv-with-meta' ) ?> <a href="http://codection.com">Codection</a>, <?php _e( 'developers of this plugin.', 'import-users-from-csv-with-meta' ); ?></p>

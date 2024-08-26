@@ -214,7 +214,6 @@ class ACUI_Import{
 
     function manage_file_upload( $path_to_file ){
         $path_to_file = wp_normalize_path( $path_to_file );
-        var_dump( $path_to_file );
         $path_to_file = $this->try_download_file( $path_to_file );
         
         if( validate_file( $path_to_file ) !== 0 ){

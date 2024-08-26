@@ -4,7 +4,7 @@ Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter
 Requires at least: 3.4
 Tested up to: 6.6.1
-Stable tag: 1.27.1
+Stable tag: 1.27.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,11 +117,15 @@ Plugin will automatically detect:
 
 == Changelog ==
 
+= 1.27.2 =
+*   Improved the way the cron result log is shown
+*   Fixed some typos
+
 = 1.27.1 =
 *   New version of ActionScheduler included
 
 = 1.27 =
-*   Improved many texts of the plugin thanks to the great help of Pierre Darmon who has completely revised the plugin's writing and helped us to make it more understandable and professional, for us who do not speak English natively
+*   Improved many messages of the plugin, thanks to the great help from Pierre Darmon who has completely revised the plugin’s messages and helped us to make it more understandable and professional, for us non-native English speakers.
 *   Fixed a problem that could create errors when trying to export data when there was a saved object
 
 = 1.26.10 =
