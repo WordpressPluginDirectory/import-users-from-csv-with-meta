@@ -82,7 +82,7 @@ class ACUI_Batch_Exporter{
 
         $row_sorted = array();
         foreach( $args['filtered_columns'] as $field ){
-            $row_sorted[ $field ] = $row[ $field ];
+            $row_sorted[ $field ] = isset( $row[ $field ] ) ? $row[ $field ] : '';
         }
 
         return $row_sorted;

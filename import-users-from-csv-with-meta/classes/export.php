@@ -266,15 +266,15 @@ class ACUI_Exporter{
 		}
                
         $exporter->set_page( $step );
-        $exporter->set_delimiter( sanitize_text_field( $_POST['delimiter'] ) );
-        $exporter->set_role( sanitize_text_field( $_POST['role'] ) );
-        $exporter->set_from( sanitize_text_field( $_POST['from'] ) );
-        $exporter->set_to( sanitize_text_field( $_POST['to'] ) );
-        $exporter->set_convert_timestamp( $_POST['convert_timestamp'] );
-        $exporter->set_datetime_format( sanitize_text_field( $_POST['datetime_format'] ) );
-        $exporter->set_order_fields_alphabetically( $_POST['order_fields_alphabetically'] );
-        $exporter->set_double_encapsulate_serialized_values( $_POST['double_encapsulate_serialized_values'] );
-		$exporter->set_display_arrays_as_comma_separated_list_of_values( $_POST['display_arrays_as_comma_separated_list_of_values'] );
+        $exporter->set_delimiter( isset( $_POST['delimiter'] ) ? sanitize_text_field( $_POST['delimiter'] ) : '' );
+        $exporter->set_role( isset( $_POST['role'] ) ? sanitize_text_field( $_POST['role'] ) : '' );
+        $exporter->set_from( isset( $_POST['from'] ) ? sanitize_text_field( $_POST['from'] ) : '' );
+        $exporter->set_to( isset( $_POST['to'] ) ? sanitize_text_field( $_POST['to'] ) : '' );
+        $exporter->set_convert_timestamp( isset( $_POST['convert_timestamp'] ) ? $_POST['convert_timestamp'] : '' );
+        $exporter->set_datetime_format( isset( $_POST['datetime_format'] ) ? sanitize_text_field( $_POST['datetime_format'] ) : '' );
+        $exporter->set_order_fields_alphabetically( isset( $_POST['order_fields_alphabetically'] ) ? $_POST['order_fields_alphabetically'] : '' );
+        $exporter->set_double_encapsulate_serialized_values( isset( $_POST['double_encapsulate_serialized_values'] ) ? $_POST['double_encapsulate_serialized_values'] : '' );
+		$exporter->set_display_arrays_as_comma_separated_list_of_values( isset( $_POST['display_arrays_as_comma_separated_list_of_values'] ) ? $_POST['display_arrays_as_comma_separated_list_of_values'] : '' );
         $exporter->set_filtered_columns( ( isset( $_POST['columns'] ) && !empty( $_POST['columns'] ) ) ? $_POST['columns'] : array() );
         $exporter->set_orderby( ( isset( $_POST['orderby'] ) && !empty( $_POST['orderby'] ) ) ? sanitize_text_field( $_POST['orderby'] ) : '' );
         $exporter->set_order( ( isset( $_POST['order'] ) && !empty( $_POST['order'] ) ) ? sanitize_text_field( $_POST['order'] ) : 'ASC' );
