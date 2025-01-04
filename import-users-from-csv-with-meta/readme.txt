@@ -3,8 +3,8 @@ Contributors: carazo, hornero
 Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter
 Requires at least: 3.4
-Tested up to: 6.7
-Stable tag: 1.27.9
+Tested up to: 6.7.1
+Stable tag: 1.27.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -116,6 +116,18 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.27.13 =
+*   The name of the exported file has been anonymized so that no attacker can brute force the file while it is being generated and before it is downloaded to obtain information
+
+= 1.27.12 =
+*   Fixed the Melapress Login Security plugin, included compatibility with version 2.0
+
+= 1.27.11 =
+*   Fixed a bug that throws an error when trying to import an incomplete class to a user meta
+
+= 1.27.10 =
+*   Fixed a bug that creates a warning
 
 = 1.27.9 =
 *   Two new buttons have been added to the user window to access import and export directly
