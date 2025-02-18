@@ -67,14 +67,18 @@ class ACUI_Settings{
                     'sanitization' => 'text',
                     'default' => 'subscriber'
                 ),
+                'not_present_same_role' => array( 
+                    'sanitization' => 'text',
+                    'default' => 'no'
+                ),                
             ),
             'import_backend' => array(),
             'import_frontend' => array(),
             'import_cron' => array(),
             'export_common' => array(
                 'role' => array( 
-                    'sanitization' => 'text',
-                    'default' => ''
+                    'sanitization' => 'array_text',
+                    'default' => array( 'subscriber' )
                 ),
                 'columns' => array( 
                     'sanitization' => 'text',
@@ -184,7 +188,7 @@ class ACUI_Settings{
                 return sanitize_text_field( $value );
 
             case 'array_text':
-                return array_map( 'sanitize_text_field', $value );
+                return array_map( 'sanitize_text_field', is_array( $value ) ? $value : array( $value ) );
 
             case 'checkbox':
                 return ( $value != 'yes' ) ? 'no' : 'yes';
