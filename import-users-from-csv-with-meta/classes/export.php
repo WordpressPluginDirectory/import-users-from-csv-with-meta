@@ -91,7 +91,6 @@ class ACUI_Exporter{
 	?>
 	<div id="acui_export_results"></div>
 
-	<h3 id="acui_export_users_header"><?php _e( 'Export users', 'import-users-from-csv-with-meta' ); ?></h3>
 	<form class="acui_exporter">
 		<table class="form-table">
 			<tbody>
@@ -150,7 +149,7 @@ class ACUI_Exporter{
 					<th scope="row"><?php _e( 'Order fields alphabetically', 'import-users-from-csv-with-meta' ); ?></th>
 					<td>
                         <?php ACUIHTML()->checkbox( array( 'name' => 'order_fields_alphabetically', 'current' => 'yes', 'compare_value' => $settings->get( 'order_fields_alphabetically' ) ) ); ?>
-						<span class="description"><?php _e( "Order all columns alphabetically to check your data more easily. The first two columns won't be affected", 'import-users-from-csv-with-meta' ); ?></span>
+						<span class="description"><?php _e( "Order all columns alphabetically to check your data more easily.", 'import-users-from-csv-with-meta' ); ?></span>
 					</td>
 				</tr>
                 <tr id="acui_order_fields_double_encapsulate_serialized_values" valign="top">

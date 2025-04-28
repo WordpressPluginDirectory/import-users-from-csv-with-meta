@@ -3,8 +3,8 @@ Contributors: carazo
 Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: csv, import, export, importer, exporter
 Requires at least: 3.4
-Tested up to: 6.7.2
-Stable tag: 1.28.3
+Tested up to: 6.8
+Stable tag: 1.28.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -116,6 +116,18 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 1.28.6 =
+*   Bug fixed, included the new file in the repository
+
+= 1.28.5 =
+*   Ready for WordPress 6.8
+*   Improved GUI with a new tab with the old CSV uploaded info
+
+= 1.28.4 =
+*   Fixed the export when selecting alphabetical order
+*   Fixed a fatal error in certain imports using certain roles
+*   Fixed a problem selecting no_role
 
 = 1.28.3 =
 *   You can now choose to delete or change the role of users that do not appear in the CSV but only of the role(s) that have appeared in the import
