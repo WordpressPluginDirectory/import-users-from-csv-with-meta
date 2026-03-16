@@ -27,9 +27,16 @@ class ACUI_Homepage{
 		$sample_url = plugin_dir_url( dirname( __FILE__ ) ) . 'test.csv';
 
 		if( ctype_digit( $settings->get( 'delete_users_assign_posts' ) ) ){
-			$delete_users_assign_posts_user = get_user_by( 'id', $settings->get( 'delete_users_assign_posts' ) );
-			$delete_users_assign_posts_options = array( $settings->get( 'delete_users_assign_posts' ) => $delete_users_assign_posts_user->display_name );
-			$delete_users_assign_posts_option_selected = $settings->get( 'delete_users_assign_posts' );
+			$delete_users_assign_posts_user_id = $settings->get( 'delete_users_assign_posts' );
+			$delete_users_assign_posts_user = get_user_by( 'id', $delete_users_assign_posts_user_id );
+
+			if( $delete_users_assign_posts_user ) {
+				$delete_users_assign_posts_options = array( $delete_users_assign_posts_user_id => $delete_users_assign_posts_user->display_name);
+			} else {
+				$delete_users_assign_posts_options = array();
+			}
+
+			$delete_users_assign_posts_option_selected = $delete_users_assign_posts_user_id;
 		}
 		else{
 			$delete_users_assign_posts_options = array( 0 => __( 'No user selected', 'import-users-from-csv-with-meta' ) );
@@ -37,12 +44,67 @@ class ACUI_Homepage{
 		}
 ?>
 	<div class="wrap acui">	
+		<style>
+		#acui_import_results{
+			display: none;
+			background-color: #f0f0f1;
+			padding: 20px;
+			margin-top: 20px;
+			margin-bottom: 20px;
+			border-radius: 6px;
+			border: 1px solid #c3c4c7;
+		}
 
+		.user-importer-progress-wrapper{
+			padding: 20px;
+			background-color: white;
+			width: 100%;
+			margin: 0 0 20px 0;
+			text-align: center;
+			border-radius: 9px;
+			box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+			box-sizing: border-box;
+			display: none;
+		}
+
+		.user-importer-progress{
+			width: 100%;
+			height: 42px;
+			border: 0;
+			border-radius: 9px;
+		}
+
+		.user-importer-progress::-webkit-progress-bar {
+			background-color: #f3f3f3;
+			border-radius: 9px;
+		}
+
+		.user-importer-progress::-webkit-progress-value {
+			background: #2271b1;
+			border-radius: 9px;
+		}
+
+		.user-importer-progress::-moz-progress-bar {
+			background: #2271b1;
+			border-radius: 9px;
+		}
+
+		.acui-importing .acui-import-options,
+		.acui-importing .sidebar,
+		.acui-importing .header,
+		.acui-importing .acui-message{
+			display: none !important;
+		}
+
+		.acui-importing .user-importer-progress-wrapper{
+			display: block !important;
+		}
+		</style>
 		<div class="row">
 			<div class="header">
 				<?php do_action( 'acui_homepage_start' ); ?>
 
-				<div id='message' class='updated acui-message'><?php printf( __( 'File must contain at least <strong>2 columns: username and email</strong>. These should be the first two columns and it should be placed <strong>in this order: username and email</strong>. Both data are required unless you use <a href="%s">this addon to allow empty emails</a>. If there are more columns, this plugin will manage it automatically.', 'import-users-from-csv-with-meta' ), 'https://import-wp.com/allow-no-email-addon/' ); ?></div>
+				<div id='message' class='updated acui-message'><?php printf( __( 'File must contain at least <strong>2 columns: username and email</strong>. These should be the first two columns and it should be placed <strong>in this order: username and email</strong>. You can name these first two columns whatever you want; only the order matters. In the rest of the columns, the order doesn\'t matter, but what you name them is what matters. Both data are required unless you use <a href="%s">this addon to allow empty emails</a>. If there are more columns, this plugin will manage it automatically.', 'import-users-from-csv-with-meta' ), 'https://import-wp.com/allow-no-email-addon/' ); ?></div>
 				<div id='message-password' class='error acui-message'><?php _e( 'Please, read carefully how <strong>passwords are managed</strong> and also take note about capitalization, this plugin is <strong>case sensitive</strong>.', 'import-users-from-csv-with-meta' ); ?></div>
 			</div>
 		</div>
@@ -51,6 +113,18 @@ class ACUI_Homepage{
 			<div class="main_bar">
 				<form method="POST" id="acui_form" enctype="multipart/form-data" action="" accept-charset="utf-8">
 
+				<div class="user-importer-progress-wrapper">
+					<progress class="user-importer-progress" value="0" max="100"></progress>
+					<div style="margin-top: 10px; font-weight: bold;">
+						<span class="user-importer-progress-value">0%</span>
+					</div>
+					<div class="user-importer-controls" style="margin-top: 20px;">
+						<button type="button" id="acui_pause_btn" class="button button-secondary"><?php _e( 'Pause', 'import-users-from-csv-with-meta' ); ?></button>
+						<button type="button" id="acui_stop_btn" class="button button-link-delete" style="color: #d63638;"><?php _e( 'Stop', 'import-users-from-csv-with-meta' ); ?></button>
+					</div>
+				</div>
+
+				<div class="acui-import-options">
 				<input class="button-primary" type="submit" name="uploadfile" id="uploadfile_btn_up" value="<?php _e( 'Start importing', 'import-users-from-csv-with-meta' ); ?>"/>
 				<input class="button-primary" type="submit" name="save_options" value="<?php _e( 'Save options without importing', 'import-users-from-csv-with-meta' ); ?>"/>
 
@@ -97,7 +171,7 @@ class ACUI_Homepage{
 							'selected' => is_array( $settings->get( 'role' ) ) ? $settings->get( 'role' ) : array( $settings->get( 'role' ) ),
 							'style' => 'width:100%;'
                         )); ?>
-						<p class="description"><?php _e( sprintf( 'You can also import roles from a CSV column. Please read documentation tab to see how it can be done. If you choose more than one role, the roles would be assigned correctly but you should use <a href="https://wordpress.org/plugins/profile-builder/">Profile Builder - Roles Editor</a> to manage them. <a href="%s">Click to Install & Activate</a>', esc_url( wp_nonce_url( self_admin_url('update.php?action=install-plugin&plugin=profile-builder'), 'install-plugin_profile-builder') ) ), 'import-users-from-csv-with-meta' ); ?></p>
+						<p class="description"><?php _e( 'You can also import roles from a CSV column. Please read the Documentation tab to see how this can be done. WordPress core allows assigning multiple roles to a user; however, the default interface only displays one role, although some plugins solve this limitation.', 'import-users-from-csv-with-meta' ); ?></p>						
 						
 						</td>
 					</tr>
@@ -282,11 +356,39 @@ class ACUI_Homepage{
 
 				<?php do_action( 'acui_tab_import_before_import_button' ); ?>
 					
-				<?php wp_nonce_field( 'codection-security', 'security' ); ?>
-
 				<input class="button-primary" type="submit" name="uploadfile" id="uploadfile_btn" value="<?php _e( 'Start importing', 'import-users-from-csv-with-meta' ); ?>"/>
 				<input class="button-primary" type="submit" name="save_options" value="<?php _e( 'Save options without importing', 'import-users-from-csv-with-meta' ); ?>"/>
+				</div>
+				<?php wp_nonce_field( 'codection-security', 'security' ); ?>
 				</form>
+				<div id="acui_import_log" style="margin-top: 20px;"></div>
+				<div id="acui_import_results">
+					<h3><?php _e( 'Results', 'import-users-from-csv-with-meta' ); ?></h3>
+					<table id="acui_import_summary" class="form-table">
+						<tbody>
+							<tr>
+								<th><?php _e( 'Users processed', 'import-users-from-csv-with-meta' ); ?></th>
+								<td><span id="acui_result_processed">0</span></td>
+							</tr>
+							<tr>
+								<th><?php _e( 'Users created', 'import-users-from-csv-with-meta' ); ?></th>
+								<td><span id="acui_result_created">0</span></td>
+							</tr>
+							<tr>
+								<th><?php _e( 'Users updated', 'import-users-from-csv-with-meta' ); ?></th>
+								<td><span id="acui_result_updated">0</span></td>
+							</tr>
+							<tr>
+								<th><?php _e( 'Users deleted', 'import-users-from-csv-with-meta' ); ?></th>
+								<td><span id="acui_result_deleted">0</span></td>
+							</tr>
+							<tr>
+								<th><?php _e( 'Errors, warnings and notices found', 'import-users-from-csv-with-meta' ); ?></th>
+								<td><span id="acui_result_errors">0</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 
 			<div class="sidebar">
@@ -341,41 +443,6 @@ class ACUI_Homepage{
 				</div>
 			</div>
 		</div>
-
-		
-		<!--<div class="row">
-			<div class="batch-importer">
-				<h1><?php esc_html_e( 'Import Products', 'woocommerce' ); ?></h1>
-				<div class="wc-progress-form-content woocommerce-importer woocommerce-importer__importing">
-					<header>
-						<span class="spinner is-active"></span>
-						<h2><?php esc_html_e( 'Importing', 'woocommerce' ); ?></h2>
-						<p><?php esc_html_e( 'Your users are now being imported...', 'woocommerce' ); ?></p>
-					</header>
-					<section>
-						<progress class="acui-importer-progress" max="100" value="0"></progress>
-					</section>
-				</div>
-
-				<div class="woocommerce-progress-form-wrapper">
-					<ol class="wc-progress-steps">
-						<?php /*foreach ( $this->steps as $step_key => $step ) : ?>
-							<?php
-							$step_class = '';
-							if ( $step_key === $this->step ) {
-								$step_class = 'active';
-							} elseif ( array_search( $this->step, array_keys( $this->steps ), true ) > array_search( $step_key, array_keys( $this->steps ), true ) ) {
-								$step_class = 'done';
-							}
-							?>
-							<li class="<?php echo esc_attr( $step_class ); ?>">
-								<?php echo esc_html( $step['name'] ); ?>
-							</li>
-						<?php endforeach;*/ ?>
-					</ol>
-				</div>
-			</div>
-		</div> -->
 	</div>
 
 	<script type="text/javascript">
