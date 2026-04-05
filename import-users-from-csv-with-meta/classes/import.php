@@ -420,7 +420,7 @@ class ACUI_Import{
                 if( $user->user_login == $username ){
                     $user_id = $id;
                     
-                    if( $password !== "" && $settings['update_allow_update_passwords'] == 'yes' ){
+                    if( $password !== "" && $settings['update_allow_update_passwords'] == 'yes' && $user_id != get_current_user_id() ){
                         wp_set_password( $password, $user_id );
                         $password_changed = true;
                     }
@@ -472,11 +472,11 @@ class ACUI_Import{
                 return array( 'result' => 'ignored', 'user_id' => $user_id );
             }
             
-            if( $password !== "" && $settings['update_allow_update_passwords'] == 'yes' ){
+            if( $password !== "" && $settings['update_allow_update_passwords'] == 'yes' && $user_id != get_current_user_id() ){
                 wp_set_password( $password, $user_id );
                 $password_changed = true;
             }
-            
+
             $new_user_id = ACUIHelper()->maybe_update_email( $user_id, $email, $password, $settings['update_emails_existing_users'], $original_email );
             if( empty( $new_user_id ) ){
                 $errors[] = ACUIHelper()->new_error( $row,  sprintf( __( 'User with email "%s" exists with other username, it will be ignored', 'import-users-from-csv-with-meta' ), $email ), 'notice' );     
@@ -510,7 +510,7 @@ class ACUI_Import{
             $data[0] = sprintf( __( 'User already exists as: %s (in this CSV file, it is called: %s)', 'import-users-from-csv-with-meta' ), $user_object->user_login, $username );
             $errors[] = ACUIHelper()->new_error( $row, $data[0], 'warning' );
 
-            if( $password !== "" && $settings['update_allow_update_passwords'] == 'yes' ){
+            if( $password !== "" && $settings['update_allow_update_passwords'] == 'yes' && $user_id != get_current_user_id() ){
                 wp_set_password( $password, $user_id );
                 $password_changed = true;
             }
@@ -628,6 +628,9 @@ class ACUI_Import{
                     }
                     elseif( strtolower( $headers[ $i ] ) == "user_pass" ){ // hashed pass
                         if( !$created && $settings['update_allow_update_passwords'] == 'no' )
+                            continue;
+
+                        if( !$created && $user_id == get_current_user_id() )
                             continue;
 
                         global $wpdb;
@@ -761,7 +764,8 @@ class ACUI_Import{
             if( !empty( $_FILES['uploadfile']['tmp_name'] ) ){
                 // Move uploaded file to a more permanent temporary location because tmp_name is deleted after request
                 $upload_dir = wp_upload_dir();
-                $file = $upload_dir['basedir'] . '/acui-import-' . uniqid() . '.csv';
+                $original_ext = strtolower( pathinfo( $_FILES['uploadfile']['name'], PATHINFO_EXTENSION ) );
+                $file = $upload_dir['basedir'] . '/acui-import-' . uniqid() . '.' . $original_ext;
                 move_uploaded_file( $_FILES['uploadfile']['tmp_name'], $file );
             }
             elseif( !empty( $_POST['path_to_file'] ) ){
@@ -913,7 +917,6 @@ class ACUI_Import{
         $settings = $this->prepare_settings( $form_data );
 
         @ini_set( 'auto_detect_line_endings', TRUE );
-        $delimiter = ACUIHelper()->detect_delimiter( $file );
 
         ACUIHelper()->maybe_disable_wordpress_core_emails();
 
@@ -970,6 +973,8 @@ class ACUI_Import{
             ACUIHelper()->print_table_header_footer( $headers, false );
         }
 
+        $file = apply_filters( 'acui_import_file_path', $file, $form_data );
+        $delimiter = ACUIHelper()->detect_delimiter( $file );
         $manager = new SplFileObject( $file );
         if( $initial_row != 0 )
             $manager->seek( $initial_row );
@@ -1029,6 +1034,11 @@ class ACUI_Import{
 
             if( $limit > 0 && ($row - $initial_row) >= $limit ){
                 $this->save_transients( $columns, $headers, $headers_filtered, $positions, $errors, $errors_totals, $results, $users_created, $users_updated, $users_ignored, $roles_appeared, $users_deleted );
+
+                if( $is_cron ){
+                    as_enqueue_async_action( 'acui_cron_process_step', array( 'step' => $step + 1, 'initial_row' => $row ) );
+                }
+
                 ACUIHelper()->print_table_end( false );
                 echo '</div>';
                 return array( 'row' => $row, 'done' => false, 'results' => $results, 'errors_count' => count( $errors ) );
