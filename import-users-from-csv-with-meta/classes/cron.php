@@ -26,7 +26,7 @@ class ACUI_Cron{
 		}
 
 		if( !function_exists( 'as_unschedule_all_actions' ) )
-			include_once( plugin_dir_path( __FILE__ ) . "lib/action-scheduler/action-scheduler.php" );
+			include_once( plugin_dir_path( dirname( __FILE__ ) ) . "lib/action-scheduler/action-scheduler.php" );
 
 		$period = sanitize_text_field( $form_data[ "period" ] );
 
@@ -80,13 +80,13 @@ class ACUI_Cron{
 
 		ob_start();
 		$acui_import = new ACUI_Import();
-		$acui_import->fileupload_process_batch_cron( $form_data );
+		$result = $acui_import->fileupload_process_batch_cron( $form_data );
 		$message .= "<br/>" . ob_get_contents() . "<br/>";
 		ob_end_clean();
 
 		$move_file_cron = get_option( "acui_move_file_cron");
-		
-		if( $move_file_cron ){
+
+		if( $move_file_cron && ( empty( $result ) || !empty( $result['done'] ) ) ){
 			$path_to_move = $this->clean_path_url_csv( get_option( "acui_cron_path_to_move") );
 			rename( $form_data[ "path_to_file" ], $path_to_move );
 			$this->auto_rename();
@@ -109,9 +109,15 @@ class ACUI_Cron{
 
 		ob_start();
 		$acui_import = new ACUI_Import();
-		$acui_import->fileupload_process_batch_cron( $form_data, $step, $initial_row );
+		$result = $acui_import->fileupload_process_batch_cron( $form_data, $step, $initial_row );
 		$message .= "<br/>" . ob_get_contents() . "<br/>";
 		ob_end_clean();
+
+		if( get_option( "acui_move_file_cron") && ( empty( $result ) || !empty( $result['done'] ) ) ){
+			$path_to_move = $this->clean_path_url_csv( get_option( "acui_cron_path_to_move") );
+			rename( $form_data[ "path_to_file" ], $path_to_move );
+			$this->auto_rename();
+		}
 
 		$message .= __( '--Finished at', 'import-users-from-csv-with-meta' ) . ' ' . date("Y-m-d H:i:s") . '<br/><br/>';
 
@@ -205,6 +211,16 @@ class ACUI_Cron{
 			display: none;
 		}
 		</style>
+
+		<?php if( !function_exists( 'acui_ic_check_active' ) ): ?>
+		<div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border-left:4px solid #2271b1;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.1);padding:16px 20px;margin:16px 0 24px;gap:20px;">
+			<div>
+				<strong><?php _e( 'Need multiple import tasks with different schedules?', 'import-users-from-csv-with-meta' ); ?></strong>
+				<p style="margin:4px 0 0;color:#50575e;"><?php _e( 'With the <strong>Recurring Import Addon</strong> you can create unlimited tasks, each with its own file, period, role and notification email.', 'import-users-from-csv-with-meta' ); ?></p>
+			</div>
+			<a href="https://import-wp.com/plugins/recurring-import-addon/" target="_blank" style="white-space:nowrap;background:#2271b1;color:#fff;border-radius:3px;padding:8px 18px;font-size:13px;font-weight:600;text-decoration:none;"><?php _e( 'Get the addon', 'import-users-from-csv-with-meta' ); ?></a>
+		</div>
+		<?php endif; ?>
 
 		<form method="POST" enctype="multipart/form-data" action="" accept-charset="utf-8">
 			<table class="form-table">
