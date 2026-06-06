@@ -4,7 +4,7 @@ Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: import users, export users, csv, migrate users, bulk import
 Requires at least: 5.5
 Tested up to: 7.0
-Stable tag: 2.3.2
+Stable tag: 2.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,6 +89,19 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 2.3.5 =
+*   Fixed a bug where the export shortcode ignored the columns attribute when field names contained spaces (e.g. BuddyBoss xProfile fields with multi-word names)
+
+= 2.3.4 =
+*   Log tab now has two sub-tabs: Backend (last manual import) and Recurring (last recurring import)
+*   Recurring import results are now saved separately and displayed independently from manual import results
+*   Log options use autoload false to avoid loading large HTML on every page load
+*   Added self-healing mechanism: if the recurring import task is dropped from Action Scheduler (e.g. after a database cleanup or plugin update), it is automatically rescheduled on the next admin page load
+
+= 2.3.3 =
+*   Improved compatibility with PHP 8.x
+*   New checkbox in every user to exclude from export
 
 = 2.3.2 =
 *   Improved date visualization
