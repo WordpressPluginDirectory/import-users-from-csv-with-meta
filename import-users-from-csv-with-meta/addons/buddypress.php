@@ -298,6 +298,96 @@ class ACUI_Buddypress{
 		$this->import_avatar_raw( $user_id, $row[ $pos ] );
 	}
 
+	function is_safe_avatar_url( $url ){
+		if ( wp_http_validate_url( $url ) === false )
+			return false;
+
+		$host = wp_parse_url( $url, PHP_URL_HOST );
+
+		if ( empty( $host ) )
+			return false;
+
+		$ip = filter_var( $host, FILTER_VALIDATE_IP ) ? $host : gethostbyname( $host );
+
+		if ( ! filter_var( $ip, FILTER_VALIDATE_IP ) )
+			return false;
+
+		$blocked_ranges = array(
+			'127.0.0.0/8',
+			'10.0.0.0/8',
+			'172.16.0.0/12',
+			'192.168.0.0/16',
+			'169.254.0.0/16',
+			'100.64.0.0/10',
+			'198.18.0.0/15',
+			'::1/128',
+			'fc00::/7',
+			'fe80::/10',
+		);
+
+		foreach ( $blocked_ranges as $range ) {
+			if ( $this->ip_in_range( $ip, $range ) )
+				return false;
+		}
+
+		return true;
+	}
+
+	function fetch_avatar_url_safely( $url, $max_redirects = 3 ){
+		for( $i = 0; $i <= $max_redirects; $i++ ){
+			if ( ! $this->is_safe_avatar_url( $url ) )
+				return false;
+
+			$response = wp_safe_remote_get( $url, array( 'redirection' => 0 ) );
+
+			if ( is_wp_error( $response ) )
+				return false;
+
+			$code = wp_remote_retrieve_response_code( $response );
+
+			if ( in_array( $code, array( 301, 302, 303, 307, 308 ), true ) ) {
+				$location = wp_remote_retrieve_header( $response, 'location' );
+
+				if ( empty( $location ) )
+					return false;
+
+				$url = WP_Http::make_absolute_url( $location, $url );
+				continue;
+			}
+
+			if ( $code !== 200 )
+				return false;
+
+			return wp_remote_retrieve_body( $response );
+		}
+
+		return false;
+	}
+
+	function ip_in_range( $ip, $range ){
+		list( $subnet, $bits ) = explode( '/', $range );
+
+		$ip_bin = inet_pton( $ip );
+		$subnet_bin = inet_pton( $subnet );
+
+		if ( $ip_bin === false || $subnet_bin === false || strlen( $ip_bin ) !== strlen( $subnet_bin ) )
+			return false;
+
+		$bits = (int) $bits;
+		$bytes = intdiv( $bits, 8 );
+		$remainder_bits = $bits % 8;
+
+		if ( $bytes > 0 && substr( $ip_bin, 0, $bytes ) !== substr( $subnet_bin, 0, $bytes ) )
+			return false;
+
+		if ( $remainder_bits === 0 )
+			return true;
+
+		$mask = chr( ( 0xFF << ( 8 - $remainder_bits ) ) & 0xFF );
+
+		return ( $ip_bin[ $bytes ] & $mask ) === ( $subnet_bin[ $bytes ] & $mask );
+	}
+
 	function import_avatar_raw( $user_id, $source ){
 		$avatar_dir = bp_core_avatar_upload_path() . '/avatars';
 
@@ -316,8 +406,19 @@ class ACUI_Buddypress{
 		}
 
 		$original_file = $avatar_folder_dir . '/import-export-users-customers-bp-avatar-' . $user_id . '.png';
-		$data = ( (string)(int)$source == $source ) ? file_get_contents( get_attached_file( $source ) ) : file_get_contents( $source );
-		
+
+		if ( (string)(int)$source == $source ) {
+			$data = file_get_contents( get_attached_file( $source ) );
+		} elseif ( preg_match( '#^https?://#i', $source ) ) {
+			$data = $this->fetch_avatar_url_safely( $source );
+		} else {
+			return false;
+		}
+
+		if ( empty( $data ) ) {
+			return false;
+		}
+
 		if ( file_put_contents( $original_file, $data ) ) {
 			$avatar_to_crop = str_replace( bp_core_avatar_upload_path(), '', $original_file );
 
