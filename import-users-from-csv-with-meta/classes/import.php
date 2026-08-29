@@ -8,6 +8,7 @@ class ACUI_Import{
     function hooks(){
         add_action( 'wp_ajax_acui_import_users_batch', array( $this, 'ajax_import_users_batch' ) );
         add_action( 'acui_post_import_single_user', array( $this, 'mark_user_as_imported' ), 10, 11 );
+        add_action( 'wp_ajax_acui_check_local_path', array( $this, 'ajax_check_local_path' ) );
     }
 
     function mark_user_as_imported( $headers, $data, $user_id, $role, $positions, $form_data, $is_frontend, $is_cron, $password_changed, $created ){
@@ -353,7 +354,7 @@ class ACUI_Import{
                 return false;
             }
 
-            $path_to_file = download_url( $path_to_file );
+            $path_to_file = $this->fetch_remote_csv_safely( $path_to_file );
 
             if( is_wp_error( $path_to_file ) ){
                 echo "<p>" . sprintf( __( 'Error, problems downloading the file from the URL: %s', 'import-users-from-csv-with-meta' ), $path_to_file->get_error_message() ) . "</p>";
@@ -362,6 +363,115 @@ class ACUI_Import{
         }
 
         return $path_to_file;
+    }
+
+    // Same SSRF hardening pattern used for the bp_avatar remote fetch (addons/buddypress.php):
+    // reject private/loopback/link-local/CGNAT hosts, and re-validate on every redirect hop
+    // instead of trusting WP core's download_url(), which follows redirects unchecked.
+    function is_safe_remote_csv_url( $url ){
+        if( wp_http_validate_url( $url ) === false )
+            return false;
+
+        $host = wp_parse_url( $url, PHP_URL_HOST );
+
+        if( empty( $host ) )
+            return false;
+
+        $ip = filter_var( $host, FILTER_VALIDATE_IP ) ? $host : gethostbyname( $host );
+
+        if( !filter_var( $ip, FILTER_VALIDATE_IP ) )
+            return false;
+
+        $blocked_ranges = array(
+            '127.0.0.0/8',
+            '10.0.0.0/8',
+            '172.16.0.0/12',
+            '192.168.0.0/16',
+            '169.254.0.0/16',
+            '100.64.0.0/10',
+            '198.18.0.0/15',
+            '::1/128',
+            'fc00::/7',
+            'fe80::/10',
+        );
+
+        foreach( $blocked_ranges as $range ){
+            if( $this->ip_in_range( $ip, $range ) )
+                return false;
+        }
+
+        return true;
+    }
+
+    function ip_in_range( $ip, $range ){
+        list( $subnet, $bits ) = explode( '/', $range );
+
+        $ip_bin = inet_pton( $ip );
+        $subnet_bin = inet_pton( $subnet );
+
+        if( $ip_bin === false || $subnet_bin === false || strlen( $ip_bin ) !== strlen( $subnet_bin ) )
+            return false;
+
+        $bits = (int) $bits;
+        $bytes = intdiv( $bits, 8 );
+        $remainder_bits = $bits % 8;
+
+        if( $bytes > 0 && substr( $ip_bin, 0, $bytes ) !== substr( $subnet_bin, 0, $bytes ) )
+            return false;
+
+        if( $remainder_bits === 0 )
+            return true;
+
+        $mask = chr( ( 0xFF << ( 8 - $remainder_bits ) ) & 0xFF );
+
+        return ( $ip_bin[ $bytes ] & $mask ) === ( $subnet_bin[ $bytes ] & $mask );
+    }
+
+    function fetch_remote_csv_safely( $url, $max_redirects = 3 ){
+        if( !function_exists( 'wp_tempnam' ) )
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+
+        for( $i = 0; $i <= $max_redirects; $i++ ){
+            if( !$this->is_safe_remote_csv_url( $url ) )
+                return new WP_Error( 'acui_unsafe_url', __( 'The URL points to a host that is not allowed (private, loopback, link-local or carrier-grade NAT address).', 'import-users-from-csv-with-meta' ) );
+
+            $tmpfname = wp_tempnam( $url );
+
+            $response = wp_safe_remote_get( $url, array(
+                'timeout'     => 300,
+                'redirection' => 0,
+                'stream'      => true,
+                'filename'    => $tmpfname,
+            ) );
+
+            if( is_wp_error( $response ) ){
+                @unlink( $tmpfname );
+                return $response;
+            }
+
+            $code = wp_remote_retrieve_response_code( $response );
+
+            if( in_array( $code, array( 301, 302, 303, 307, 308 ), true ) ){
+                @unlink( $tmpfname );
+
+                $location = wp_remote_retrieve_header( $response, 'location' );
+
+                if( empty( $location ) )
+                    return new WP_Error( 'acui_bad_redirect', __( 'The server returned a redirect without a valid destination.', 'import-users-from-csv-with-meta' ) );
+
+                $url = WP_Http::make_absolute_url( $location, $url );
+                continue;
+            }
+
+            if( $code !== 200 ){
+                @unlink( $tmpfname );
+                return new WP_Error( 'acui_download_failed', sprintf( __( 'The server responded with HTTP %d.', 'import-users-from-csv-with-meta' ), $code ) );
+            }
+
+            return $tmpfname;
+        }
+
+        return new WP_Error( 'acui_too_many_redirects', __( 'Too many redirects while trying to download the file.', 'import-users-from-csv-with-meta' ) );
     }
 
     function manage_file_upload( $path_to_file ){
@@ -393,16 +503,64 @@ class ACUI_Import{
             return false;
 
         $upload_dir = wp_upload_dir();
-        $real_base = realpath( $upload_dir['basedir'] );
         $real_path = realpath( $path_to_file );
 
-        if( $real_base === false || $real_path === false )
+        if( $real_path === false )
             return false;
 
-        $real_base = wp_normalize_path( $real_base );
         $real_path = wp_normalize_path( $real_path );
 
-        return strpos( $real_path, trailingslashit( $real_base ) ) === 0;
+        // Sites that generate the CSV outside wp-content/uploads can widen this via code,
+        // e.g. add_filter( 'acui_allowed_local_csv_base_dirs', fn( $dirs ) => array_merge( $dirs, array( '/usr/home/user/public_html/DCC/Update' ) ) );
+        $allowed_base_dirs = apply_filters( 'acui_allowed_local_csv_base_dirs', array( $upload_dir['basedir'] ), $path_to_file );
+
+        foreach( (array) $allowed_base_dirs as $base_dir ){
+            $real_base = realpath( $base_dir );
+
+            if( $real_base === false )
+                continue;
+
+            $real_base = wp_normalize_path( $real_base );
+
+            if( strpos( $real_path, trailingslashit( $real_base ) ) === 0 )
+                return true;
+        }
+
+        return false;
+    }
+
+    function get_local_path_status( $path_to_file ){
+        $path_to_file = wp_normalize_path( trim( $path_to_file ) );
+
+        if( $path_to_file === '' )
+            return array( 'status' => 'empty', 'message' => __( 'Enter a path or URL first.', 'import-users-from-csv-with-meta' ) );
+
+        if( wp_http_validate_url( $path_to_file ) !== false )
+            return array( 'status' => 'url', 'message' => __( 'This is a URL. It will be downloaded at import time and is not restricted to the uploads folder.', 'import-users-from-csv-with-meta' ) );
+
+        if( strtolower( pathinfo( $path_to_file, PATHINFO_EXTENSION ) ) !== 'csv' )
+            return array( 'status' => 'invalid', 'message' => __( 'The path must point to a .csv file.', 'import-users-from-csv-with-meta' ) );
+
+        if( !file_exists( $path_to_file ) )
+            return array( 'status' => 'invalid', 'message' => __( 'The file cannot be found at that path on the server.', 'import-users-from-csv-with-meta' ) );
+
+        if( !$this->is_allowed_local_csv( $path_to_file ) ){
+            $upload_dir = wp_upload_dir();
+            $allowed_base_dirs = apply_filters( 'acui_allowed_local_csv_base_dirs', array( $upload_dir['basedir'] ), $path_to_file );
+            return array( 'status' => 'invalid', 'message' => sprintf( __( 'The file exists but is located outside the allowed folder(s) (%s), so the import will refuse it.', 'import-users-from-csv-with-meta' ), implode( ', ', (array) $allowed_base_dirs ) ) );
+        }
+
+        return array( 'status' => 'valid', 'message' => __( 'This path is valid and allowed.', 'import-users-from-csv-with-meta' ) );
+    }
+
+    function ajax_check_local_path(){
+        check_ajax_referer( 'codection-security', 'security' );
+
+        if( !current_user_can( apply_filters( 'acui_capability', 'create_users' ) ) )
+            wp_die( -1 );
+
+        $path = isset( $_POST['path'] ) ? sanitize_text_field( wp_unslash( $_POST['path'] ) ) : '';
+        wp_send_json( $this->get_local_path_status( $path ) );
     }
 
     function fileupload_process( $form_data, $is_cron = false, $is_frontend  = false ) {
@@ -499,19 +657,22 @@ class ACUI_Import{
         
         $id_position = isset( $positions["id"] ) ? $positions["id"] : false;
         $id = ( empty( $id_position ) ) ? '' : $data[ $id_position ];
-        
+
+        $first_name_position = isset( $positions["first_name"] ) ? $positions["first_name"] : false;
+        $first_name = ( $first_name_position === false ) ? '' : $data[ $first_name_position ];
+
+        $last_name_position = isset( $positions["last_name"] ) ? $positions["last_name"] : false;
+        $last_name = ( $last_name_position === false ) ? '' : $data[ $last_name_position ];
+
         $created = true;
         
         if( $role_position === false ){
             $role = $settings['role_default'];
         }
         else{
-            $roles_cells = explode( ',', $data[ $role_position ] );
-            
-            if( !is_array( $roles_cells ) )
-                $roles_cells = array( $roles_cells );
+            $roles_cells = is_array( $data[ $role_position ] ) ? $data[ $role_position ] : explode( ',', $data[ $role_position ] );
 
-            array_walk( $roles_cells, 'trim' );
+            $roles_cells = array_map( 'trim', $roles_cells );
             
             foreach( $roles_cells as $it => $role_cell )
                 $roles_cells[ $it ] = strtolower( $role_cell );
@@ -521,20 +682,31 @@ class ACUI_Import{
 
         $no_role = ( $role == 'no_role' ) || in_array( 'no_role', $role );
 
-        if( !$no_role ){
-            if( ( !empty( $role ) || is_array( $role ) && empty( $role[0] ) ) && !empty( array_diff( $role, array_keys( wp_roles()->roles ) ) ) && $settings['update_roles_existing_users'] != 'no' ){
-                if( is_array( $role ) && empty( $role[0] ) )
-                    $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'If you are upgrading roles, you must choose at least one role', 'import-users-from-csv-with-meta' ), implode( ', ', $role ) ) );
-                else
-                    $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'Some of the next roles "%s" do not exists', 'import-users-from-csv-with-meta' ), implode( ', ', $role ) ) );
-                
+        if( !$no_role && $role_position !== false ){
+            $checked_roles = ACUIHelper()->check_roles( $role );
+
+            if( !empty( $checked_roles['not_existing'] ) ){
+                foreach( $checked_roles['not_existing'] as $not_existing_role ){
+                    if( isset( $checked_roles['suggestions'][ $not_existing_role ] ) )
+                        $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'The role "%1$s" does not exist on this site, but there is a role named like that whose slug is "%2$s": you have to use the slug of the role and not its name', 'import-users-from-csv-with-meta' ), $not_existing_role, $checked_roles['suggestions'][ $not_existing_role ] ) );
+                    else
+                        $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'The role "%1$s" does not exist on this site, these are the roles you can use: %2$s', 'import-users-from-csv-with-meta' ), $not_existing_role, implode( ', ', array_keys( ACUIHelper()->get_editable_roles( false ) ) ) ) );
+                }
+
                 return array( 'result' => 'ignored', 'user_id' => $user_id );
             }
 
-            if ( ( !empty( $role ) || is_array( $role ) && empty( $role[0] ) ) && !empty( array_diff( $role, array_keys( ACUIHelper()->get_editable_roles() ) ) ) ){ // users only are able to import users with a role they are allowed to edit
-                $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'You do not have permission to assign some of the next roles "%s"', 'import-users-from-csv-with-meta' ), implode( ', ', $role ) ) );
+            if( !empty( $checked_roles['not_editable'] ) ){
+                $errors[] = ACUIHelper()->new_error( $row, sprintf( __( 'The role "%1$s" exists but you are not allowed to assign it, probably because another plugin or your own role limits which roles you can manage: you can only assign %2$s', 'import-users-from-csv-with-meta' ), implode( '", "', $checked_roles['not_editable'] ), implode( ', ', array_keys( ACUIHelper()->get_editable_roles( false ) ) ) ) );
                 return array( 'result' => 'ignored', 'user_id' => $user_id );
             }
+
+            if( empty( $checked_roles['roles'] ) ){
+                $errors[] = ACUIHelper()->new_error( $row, __( 'The role column is empty on this row, you have to write at least one role or use "no_role" if you do not want to assign any', 'import-users-from-csv-with-meta' ) );
+                return array( 'result' => 'ignored', 'user_id' => $user_id );
+            }
+
+            $role = $checked_roles['roles'];
         }
 
         if( !empty( $email ) && ( ( sanitize_email( $email ) == '' ) ) ){ // if email is invalid
@@ -566,7 +738,7 @@ class ACUI_Import{
                         $password_changed = true;
                     }
 
-                    $new_user_id = ACUIHelper()->maybe_update_email( $user_id, $email, $password, $settings['update_emails_existing_users'], $original_email );
+                    $new_user_id = ACUIHelper()->maybe_update_email( $user_id, $email, $password, $settings['update_emails_existing_users'], $original_email, $first_name, $last_name );
                     if( empty( $new_user_id ) ){
                         $errors[] = ACUIHelper()->new_error( $row,  sprintf( __( 'User with email "%s" exists, we ignore it', 'import-users-from-csv-with-meta' ), $email ), 'notice' );
                         return array( 'result' => 'ignored', 'user_id' => $user_id );
@@ -618,9 +790,9 @@ class ACUI_Import{
                 $password_changed = true;
             }
 
-            $new_user_id = ACUIHelper()->maybe_update_email( $user_id, $email, $password, $settings['update_emails_existing_users'], $original_email );
+            $new_user_id = ACUIHelper()->maybe_update_email( $user_id, $email, $password, $settings['update_emails_existing_users'], $original_email, $first_name, $last_name );
             if( empty( $new_user_id ) ){
-                $errors[] = ACUIHelper()->new_error( $row,  sprintf( __( 'User with email "%s" exists with other username, it will be ignored', 'import-users-from-csv-with-meta' ), $email ), 'notice' );     
+                $errors[] = ACUIHelper()->new_error( $row,  sprintf( __( 'User with email "%s" exists with other username, it will be ignored', 'import-users-from-csv-with-meta' ), $email ), 'notice' );
                 return array( 'result' => 'ignored', 'user_id' => $new_user_id );
             }
             
@@ -703,7 +875,7 @@ class ACUI_Import{
                     }
 
                     if( !empty( $role ) ){
-                        $editable_roles = ACUIHelper()->get_editable_roles();
+                        $editable_roles = array_change_key_case( ACUIHelper()->get_editable_roles(), CASE_LOWER );
                         $role = array_filter( (array) $role, function( $single_role ) use ( $editable_roles ) {
                             return array_key_exists( strtolower( trim( $single_role ) ), $editable_roles );
                         } );
@@ -729,7 +901,6 @@ class ACUI_Import{
                         }
 
                         foreach ($role as $single_role) {
-                            $single_role = strtolower($single_role);
                             if( get_role( $single_role ) ){
                                 $user_object->add_role( $single_role );
                             }
@@ -809,19 +980,26 @@ class ACUI_Import{
                     elseif( in_array( $headers[ $i ], ACUIHelper()->get_not_meta_fields() ) ){
                         continue;
                     }
-                    else{				
+                    elseif( in_array( strtolower( $headers[ $i ] ), array_map( 'strtolower', ACUIHelper()->get_forbidden_meta_fields() ), true ) ){ // sensitive keys (e.g. wp_capabilities) are never writable as arbitrary meta
+                        continue;
+                    }
+                    else{
+                        if( !$created && !current_user_can( 'edit_user', $user_id ) ){
+                            continue;
+                        }
+
                         if( $data[ $i ] === '' ){
                             if( $settings['empty_cell_action'] == "delete" )
                                 delete_user_meta( $user_id, $headers[ $i ] );
                             else
-                                continue;	
+                                continue;
                         }
                         else{
                             if( is_object( $data[ $i ] ) && get_class( $data[ $i ] ) === '__PHP_Incomplete_Class' )
                                 $errors[] = ACUIHelper()->new_error( $row, __( 'Invalid value __PHP_Incomplete_Class', 'import-users-from-csv-with-meta' ), 'warning' );
-                            else    
+                            else
                                 update_user_meta( $user_id, $headers[ $i ], $data[ $i ] );
-                            
+
                             continue;
                         }
                     }

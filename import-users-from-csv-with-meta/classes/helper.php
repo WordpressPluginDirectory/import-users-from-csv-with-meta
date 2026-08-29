@@ -62,9 +62,7 @@ class ACUI_Helper{
     }
 
     static function get_editable_roles( $include_no_role = true ){
-        global $wp_roles;
-    
-        $all_roles = $wp_roles->roles;
+        $all_roles = wp_roles()->roles;
         $editable_roles = apply_filters('editable_roles', $all_roles);
         $list_editable_roles = array();
     
@@ -73,8 +71,57 @@ class ACUI_Helper{
 
         if( $include_no_role )
             $list_editable_roles['no_role'] = __( 'No role', 'import-users-from-csv-with-meta' );
-        
+
         return $list_editable_roles;
+    }
+
+    static function check_roles( $roles ){
+        $result = array( 'roles' => array(), 'empty' => false, 'not_existing' => array(), 'not_editable' => array(), 'suggestions' => array() );
+
+        $all_roles = wp_roles()->roles;
+        $slugs = array();
+        $names = array();
+
+        foreach( $all_roles as $slug => $role_data ){
+            $slugs[ strtolower( $slug ) ] = $slug;
+            $name = isset( $role_data['name'] ) ? $role_data['name'] : '';
+
+            if( !empty( $name ) ){
+                $names[ strtolower( $name ) ] = $slug;
+                $names[ strtolower( translate_user_role( $name ) ) ] = $slug;
+            }
+        }
+
+        $editable_slugs = array();
+        foreach( array_keys( self::get_editable_roles() ) as $editable_slug )
+            $editable_slugs[ strtolower( $editable_slug ) ] = $editable_slug;
+
+        foreach( (array) $roles as $role ){
+            $role = strtolower( trim( $role ) );
+
+            if( $role === '' ){
+                $result['empty'] = true;
+                continue;
+            }
+
+            if( !isset( $slugs[ $role ] ) && $role != 'no_role' ){
+                $result['not_existing'][] = $role;
+
+                if( isset( $names[ $role ] ) )
+                    $result['suggestions'][ $role ] = $names[ $role ];
+
+                continue;
+            }
+
+            if( !isset( $editable_slugs[ $role ] ) ){
+                $result['not_editable'][] = $role;
+                continue;
+            }
+
+            $result['roles'][] = $editable_slugs[ $role ];
+        }
+
+        return $result;
     }
 
     static function get_csv_delimiters_titles(){
@@ -149,8 +196,16 @@ class ACUI_Helper{
         $wp_users_fields = $this->get_wp_users_fields();
         $wp_min_fields = array( "Username", "Email", "role", $wpdb->prefix . 'capabilities', $wpdb->prefix . 'user_level' );
         $acui_restricted_fields = array_merge( $wp_users_fields, $wp_min_fields );
-        
+
         return apply_filters( 'acui_restricted_fields', $acui_restricted_fields );
+    }
+
+    function get_forbidden_meta_fields(){
+        global $wpdb;
+
+        $acui_forbidden_meta_fields = array( "Username", "Email", "role", $wpdb->prefix . 'capabilities', $wpdb->prefix . 'user_level' );
+
+        return apply_filters( 'acui_forbidden_meta_fields', $acui_forbidden_meta_fields );
     }
 
     function get_not_meta_fields(){
@@ -161,8 +216,29 @@ class ACUI_Helper{
         do {
             $rnd_str = sprintf("%06d", mt_rand(1, 999999));
         } while( username_exists( $prefix . $rnd_str ) );
-        
+
         return $prefix . $rnd_str;
+    }
+
+    function get_username_from_name( $first_name, $last_name ){
+        $base = remove_accents( trim( $first_name ) . ' ' . trim( $last_name ) );
+        $base = sanitize_user( $base, true );
+        $base = ucwords( strtolower( trim( $base ) ) );
+        $base = preg_replace( '/[^a-zA-Z0-9]/', '', $base );
+
+        if( empty( $base ) )
+            return $this->get_random_unique_username( 'duplicated_username_' );
+
+        if( !username_exists( $base ) )
+            return $base;
+
+        $suffix = 2;
+        do {
+            $candidate = $base . $suffix;
+            $suffix++;
+        } while( username_exists( $candidate ) );
+
+        return $candidate;
     }
 
     function array_one_dimension($array) {
@@ -222,10 +298,13 @@ class ACUI_Helper{
         return array( 'row' => $row, 'message' => $message, 'type' => $type );
     }
 
-    function maybe_update_email( $user_id, $email, $password, $update_emails_existing_users, $original_email ){
+    function maybe_update_email( $user_id, $email, $password, $update_emails_existing_users, $original_email, $first_name = '', $last_name = '' ){
         $user_object = get_user_by( 'id', $user_id );
 
-        if( $user_object->user_email == $email || ( apply_filters( 'acui_allow_no_email', false ) && empty( $original_email ) ) )
+        $normalized_existing_email = strtolower( trim( $user_object->user_email ) );
+        $normalized_new_email = strtolower( trim( $email ) );
+
+        if( ( !empty( $normalized_existing_email ) && !empty( $normalized_new_email ) && $normalized_existing_email === $normalized_new_email ) || ( apply_filters( 'acui_allow_no_email', false ) && empty( $original_email ) ) )
             return $user_id;
 
         switch( $update_emails_existing_users ){
@@ -242,11 +321,11 @@ class ACUI_Helper{
 
             case 'create':
                 $user_id = wp_insert_user( array(
-                    'user_login'  =>  $this->get_random_unique_username( 'duplicated_username_' ),
+                    'user_login'  =>  $this->get_username_from_name( $first_name, $last_name ),
                     'user_email'  =>  $email,
                     'user_pass'   =>  $password
                 ) );
-            break;           
+            break;
         }
 
         return $user_id;
@@ -411,6 +490,8 @@ class ACUI_Helper{
             $element = esc_html( $element );
             echo "<td>$element</td>";
         }
+
+        do_action( 'acui_row_table_extra_rows', $row, $data );
 
         echo "</tr>\n";
     

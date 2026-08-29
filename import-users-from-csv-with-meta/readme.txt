@@ -3,8 +3,8 @@ Contributors: carazo
 Donate link: https://codection.com/go/donate-import-users-from-csv-with-meta/
 Tags: import users, export users, csv, migrate users, bulk import
 Requires at least: 5.5
-Tested up to: 7.0
-Stable tag: 2.4.6
+Tested up to: 7.1
+Stable tag: 2.4.15
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,22 @@ Plugin will automatically detect:
 * It also will **auto detect line-ending** to prevent problems with different OS.
 * Finally, it will **detect the delimiter** being used in CSV file
 
+== Frequently Asked Questions ==
+
+= I get a "too many redirects" error on my site, how can I solve it? =
+
+This is caused by the option that forces the users to reset their password. When it is used, each of those users is redirected to their password page on every page load until they change it, and if that destination cannot be reached (for example, because wp-admin is blocked for customers or subscribers by WooCommerce, by a membership plugin or by a security plugin) the browser ends up in a redirection loop.
+
+Since version 2.4.12 the plugin detects this situation and gives up after 3 consecutive redirects, so the site stays usable, but you can also clear the flag for the users that are already affected: go to the plugin documentation tab and use the button that removes the force reset password metadata from all the users.
+
+If you want to change how many redirects are allowed before the plugin gives up, use the `acui_force_reset_password_max_redirects` filter (return 0 to disable the limit):
+
+`add_filter( 'acui_force_reset_password_max_redirects', function( $max ){ return 5; } );`
+
+= Which page are the users sent to when I force them to reset their password? =
+
+By default they are sent to their WordPress profile page. If WooCommerce or WP User Manager are active, they are sent to the password section of the account page of those plugins instead. You can point them anywhere else using the `acui_force_reset_password_edit_profile_url` filter, and you can add your own exceptions (pages where the redirection must not happen) using `acui_force_reset_password_redirect_condition`.
+
 == Screenshots ==
 
 1. Import dialog
@@ -89,6 +105,54 @@ Plugin will automatically detect:
 5. Extra profile information (user meta)
 
 == Changelog ==
+
+= 2.4.15 =
+*   Security fix (privilege escalation): saving the Cron tab settings (`acui_cron_save_settings`) checked only the shared plugin nonce and, for the "User that runs the cron" field, that the selected user held the same broad menu capability (`create_users` by default) as whoever was saving. This let a user with `create_users` but not `promote_users` (or `delete_users`) select an Administrator as the execution identity, set the default role to `administrator`, or enable "delete users not present"/"change role of users not present", and then trigger the "Run now" no-session action, which runs the import with no logged-in user and falls back to the site's first Administrator. The `promote_users` check on role assignment and the missing capability checks on user deletion and role change only saw that substituted Administrator, not the actual caller, so a delegated importer could create a new Administrator account or delete/demote existing users. The Cron tab now requires `promote_users` to set a default role, to set the "change role of users not present" role, or to select an execution user that itself has `promote_users`, and requires `delete_users` to enable "delete users not present"
+*   Security fix (hardening): the same settings are also now rejected outright (instead of silently ignored) when the current user lacks the required capability, so a misconfigured attempt fails loudly rather than saving a partial, inconsistent state
+
+= 2.4.14 =
+*   Improvement: the "Path or URL of file that is going to be imported" field (manual import and Cron tab) now explains right on screen that a local path must be located inside the WordPress uploads folder, and shows the actual folder path of the site
+*   Improvement: added a "Check path" button next to that field to verify, before saving or running the import, whether the entered path or URL will be accepted, and why not otherwise
+*   Improvement: saving the Cron settings now shows a warning notice when the configured path is not a valid local path (wrong extension, file not found, or outside the uploads folder), instead of only failing silently at the next scheduled run
+*   New: added the `acui_allowed_local_csv_base_dirs` filter so a developer can whitelist extra local base folders for the CSV path (e.g. a folder an external process writes to), without disabling the underlying security check added in 2.4.3
+*   Security fix (hardening): importing a CSV from a remote URL (manual import and Cron tab) now blocks link-local (`169.254.0.0/16`, including the cloud metadata endpoint `169.254.169.254`) and carrier-grade NAT (`100.64.0.0/10`, `198.18.0.0/15`) hosts, and re-validates every redirect hop against the same SSRF blocklist instead of letting `download_url()` follow redirects unchecked. This closes the same class of Server-Side Request Forgery that was already fixed for the BuddyPress/BuddyBoss `bp_avatar` import in 2.4.3/3.x, but that fix had not been applied to the main CSV-by-URL import path
+
+= 2.4.13 =
+*   Improvement: the role errors during the import now say exactly what is wrong instead of always blaming permissions. The row is checked role by role and the message tells which single role failed and why: the role does not exist (and lists the roles that can be used), the role exists but the current user is not allowed to assign it (and lists which ones they can), or the role column is empty on that row. Before, a role that simply did not exist was reported as *"You do not have permission to assign some of the next roles"* whenever the "update roles of existing users" option was set to "no", because the "role does not exist" check was skipped in that case, and both messages printed the whole list of roles of the row instead of the offending ones
+*   Improvement: when the CSV carries the name of the role (`Conference`) instead of its slug (`conference_member`), the error now points to the right slug instead of only saying that the role does not exist
+*   Fix: roles whose slug contains uppercase letters (created that way by some role editor plugins) can be imported again. The values of the `role` column were lowercased but compared against the role slugs as they are stored, so those roles were always rejected as non existing or invalid
+*   Fix: `ACUI_Helper::get_editable_roles()` uses `wp_roles()` instead of reading the `$wp_roles` global directly, which could still be uninitialized in cron or front end imports, leaving the list of editable roles empty and making every role of the CSV fail
+*   Fix: a `role` cell containing the `::` list separator no longer produces a fatal error when the row is prepared
+
+= 2.4.12 =
+*   Fix: the "force users to reset their password" option no longer produces "too many redirects" errors. The redirection ran on every front end page load and only stopped when the add-on condition matched exactly, so any setup where the destination could not be reached or recognized (wp-admin blocked for customers by WooCommerce or a membership plugin, a My account URL that did not match the `home_url()` string comparison because of trailing slashes, www, https or a language prefix, an account page built with blocks or a page builder instead of the shortcode...) sent the user back and forth forever. The redirection is now skipped when the user is already on the destination URL, it does not run on AJAX, REST, cron, XML-RPC or non GET requests, and a counter stops it after 3 consecutive redirects (filterable through the new `acui_force_reset_password_max_redirects` hook) so the worst case is that the password change is not enforced instead of the site being unreachable
+
+= 2.4.11 =
+*   Security fix: the mail options save handler no longer writes to arbitrary posts. The `template_id` form field was passed straight to `wp_update_post()` without checking the post type or `current_user_can( 'edit_post' )`, so a user with only the `create_users` capability could overwrite the title and the content of any post or page of the site (and inject arbitrary CSS through the `<style>` tag the email editor allows) just by changing that hidden field. The plugin now validates that the id belongs to an `acui_email_template` post the current user is allowed to edit, and shows a warning notice instead of saving when it does not (reported by Averon Averenkov (averonsec.com))
+*   Security fix (hardening): the email attachment id sent from the mail options form is now validated as a real media library file before being stored, instead of being saved as an option and as a post meta of the email template straight from the form field
+*   Fix: WooCommerce columns (`billing_*` and `shipping_*`) are imported again. The 2.4.9 security fix blocked every field returned by `acui_restricted_fields` from being saved as user meta, but that filter is public and add-ons extend it, so the 20 WooCommerce customer fields (and any field added by a third party through that filter) stopped being imported. The sensitive keys are now listed apart in `ACUIHelper()->get_forbidden_meta_fields()`, filterable through the new `acui_forbidden_meta_fields` hook, and `acui_restricted_fields` goes back to being only about column mapping
+*   Fix: the WooCommerce Subscriptions add-on no longer tries to create a subscription for rows that carry no subscription data at all, which produced a bogus "Could not create subscription: Invalid subscription billing period" error on every imported row when the CSV had no subscription columns. It now returns early unless at least one of its columns is present and filled in the row
+*   Fix: the results table no longer breaks with a "DataTables warning: Requested unknown parameter" message when WooCommerce Subscriptions is active. The add-on added two columns to the table header but printed its cells from `acui_post_import_single_user`, which runs after `print_row_imported()` has already closed the `<tr>`, so those cells fell outside the row and every row was two columns short. There is a new `acui_row_table_extra_rows` action to print cells inside the row, and the add-on now prints exactly two cells per row (one for the warnings and one for the errors) instead of one cell per message
+*   Security fix (hardening): the check that blocks sensitive keys (`wp_capabilities`, `wp_user_level`, `role`, `Username`, `Email`) from being written as user meta during the import is now case insensitive, so a column header like `WP_Capabilities` cannot get through it
+
+= 2.4.10 =
+*   Security fix: the `acui_delete_attachment` AJAX handler now really blocks the deletion when the attachment is not a `text/csv` file. The mime type check only printed a warning and then deleted the file anyway, so a user with the `create_users` capability could delete any attachment of the media library (images, PDFs...) and not only the CSV files the plugin manages (reported by Averon Averenkov (averonsec.com))
+*   Improvement: removed `classes/csv-uploaded.php`, a leftover copy of `classes/tools.php` (same code, class renamed) whose GUI was never called but which still registered the `acui_delete_attachment` and `acui_bulk_delete_attachment` AJAX handlers a second time
+*   Security fix (hardening): the AJAX handlers that fire the cron import task (`acui_fire_cron`, `acui_fire_cron_no_session`), remove the email attachment (`acui_mail_options_remove_attachment`) and send the test email (`acui_send_test_email`) now check `current_user_can()` in addition to the nonce, matching the rest of the plugin's AJAX endpoints. They were relying on the nonce alone for authorization (reported by Averon Averenkov (averonsec.com))
+*   Security fix: the `#action_assign_post` column now checks `current_user_can( 'edit_post', $post_id )` before reassigning the post author, and silently skips any post id that fails the check. Previously a user with only the `create_users` capability could take over the authorship of any post on the site (including admin-authored ones) just by putting its id in that column (reported by Averon Averenkov (averonsec.com))
+
+= 2.4.9 =
+*   Security fix: during CSV import, unrecognized column headers no longer write to arbitrary user meta via `update_user_meta()` without an authorization check, and sensitive keys (`wp_capabilities`, `wp_user_level`, `role`, `Username`, `Email`) are now hard-blocked from this fallback path. Previously a user with only the `create_users` capability (e.g. a Shop Manager, or any role delegated CSV-import rights) could escalate their own account to Administrator by uploading a CSV with a `wp_capabilities` column
+
+= 2.4.8 =
+*   Fix: email matching during import (`maybe_update_email()`) now normalizes both the stored and CSV emails with `strtolower(trim())` before comparing, so a case difference (e.g. `John.Doe@Example.com` vs `john.doe@example.com`) no longer triggers a false "email changed" event, unnecessary `wp_update_user()` calls, or duplicate account creation
+*   Improvement: when the plugin creates a new account because the CSV email didn't match an existing user (the `create` update-emails option), the new account's username is now derived from the row's `first_name`/`last_name` when available (e.g. `JohnDoe`, with `JohnDoe2`, `JohnDoe3`... on collision) instead of always falling back to an opaque `duplicated_username_XXXXXX` login
+*   Improvement: the BuddyPress/BuddyBoss `bp_member_type` CSV column is now matched case-insensitively against the header row, consistent with how `password`/`user_pass` are already matched
+*   Docs: documented the BuddyPress/BuddyBoss `bp_member_type` (Profile Type) import/export column, which was previously undocumented in the in-plugin help text
+
+= 2.4.7 =
+*   Fix: the `role` column now correctly trims leading/trailing spaces from each comma-separated value (e.g. `executive_member, tracker_exclude`). The previous code called `array_walk( $roles_cells, 'trim' )`, which is a no-op because `trim()` does not modify its argument by reference, so roles with a stray space (as commonly added by spreadsheet tools like Google Sheets) were silently treated as invalid and ignored
+*   Fix: the Groups add-on (`group_id`/`group_name` columns) now also trims each comma-separated value before matching it against an existing group, avoiding the same issue when assigning multiple groups per user
 
 = 2.4.6 =
 *   Security fix: custom profile field values (Tools > Show fields in profile) are now sanitized with `sanitize_text_field()` before being stored as user meta in `save_extra_user_profile_fields()`, closing a stored XSS vector where a low-privileged user (e.g. Subscriber) could stash an HTML/JS payload in a custom column (reported by Luca Laytynher (LyT))
