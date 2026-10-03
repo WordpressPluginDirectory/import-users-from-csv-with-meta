@@ -6,7 +6,7 @@ class ACUI_Cron{
 	function __construct(){
 		add_action( 'acui_cron_save_settings', array( $this, 'save_settings' ) );
 		add_action( 'acui_cron_process', array( $this, 'process' ) );
-		add_action( 'acui_cron_process_step', array( $this, 'process_step' ), 10, 3 );
+		add_action( 'acui_cron_process_step', array( $this, 'process_step' ), 10, 4 );
 		add_action( 'acui_cron_log_action', array( $this, 'handle_log_action' ) );
 		add_action( 'wp_ajax_acui_fire_cron', array( $this, 'ajax_fire_cron' ) );
 		add_action( 'wp_ajax_acui_fire_cron_no_session', array( $this, 'ajax_fire_cron_no_session' ) );
@@ -35,6 +35,15 @@ class ACUI_Cron{
 			return '';
 
 		return $path_url;
+	}
+
+	static function get_update_roles_existing_users(){
+		$value = get_option( "acui_cron_update_roles_existing_users" );
+
+		if( in_array( $value, array( 'no', 'yes', 'yes_no_override' ), true ) )
+			return $value;
+
+		return ( $value ) ? 'yes' : 'no';
 	}
 
 	function save_settings( $form_data ){
@@ -72,7 +81,11 @@ class ACUI_Cron{
 		update_option( "acui_cron_path_to_move_auto_rename", isset( $form_data["path_to_move_auto_rename"] ) && $form_data["path_to_move_auto_rename"] == "1" );
 		update_option( "acui_cron_allow_multiple_accounts", ( isset( $form_data["allow_multiple_accounts"] ) && $form_data["allow_multiple_accounts"] == "1" ) ? "allowed" : "not_allowed" );
 		$submitted_user_id = isset( $form_data['cron_user_id'] ) ? absint( $form_data['cron_user_id'] ) : 0;
-		if( $submitted_user_id && user_can( $submitted_user_id, apply_filters( 'acui_capability', 'create_users' ) ) ){
+		update_option( "acui_cron_configured_by", get_current_user_id() );
+		if( !current_user_can( 'edit_users' ) ){
+			update_option( "acui_cron_user_id", get_current_user_id() );
+		}
+		elseif( $submitted_user_id && user_can( $submitted_user_id, apply_filters( 'acui_capability', 'create_users' ) ) ){
 			if( user_can( $submitted_user_id, 'promote_users' ) && !current_user_can( 'promote_users' ) )
 				wp_die( __( 'You are not allowed to select this user to run the import task.', 'import-users-from-csv-with-meta' ) );
 			update_option( "acui_cron_user_id", $submitted_user_id );
@@ -85,8 +98,16 @@ class ACUI_Cron{
 		if( !empty( $submitted_role ) && !current_user_can( 'promote_users' ) )
 			wp_die( __( 'You are not allowed to assign roles.', 'import-users-from-csv-with-meta' ) );
 		update_option( "acui_cron_role", $submitted_role );
-		update_option( "acui_cron_update_roles_existing_users", isset( $form_data["update-roles-existing-users"] ) && $form_data["update-roles-existing-users"] == "1" );
-		update_option( "acui_cron_change_role_not_present", isset( $form_data["cron-change-role-not-present"] ) && $form_data["cron-change-role-not-present"] == "1" );
+		update_option( "acui_cron_role_authorized", current_user_can( 'promote_users' ) );
+		$update_roles_existing_users = isset( $form_data["update-roles-existing-users"] ) ? sanitize_text_field( $form_data["update-roles-existing-users"] ) : 'no';
+		$update_roles_existing_users = in_array( $update_roles_existing_users, array( 'no', 'yes', 'yes_no_override' ), true ) ? $update_roles_existing_users : 'no';
+		if( $update_roles_existing_users != 'no' && !current_user_can( 'promote_users' ) )
+			wp_die( __( 'You are not allowed to assign roles.', 'import-users-from-csv-with-meta' ) );
+		update_option( "acui_cron_update_roles_existing_users", $update_roles_existing_users );
+		$change_role_not_present = isset( $form_data["cron-change-role-not-present"] ) && $form_data["cron-change-role-not-present"] == "1";
+		if( $change_role_not_present && !current_user_can( 'promote_users' ) )
+			wp_die( __( 'You are not allowed to assign roles.', 'import-users-from-csv-with-meta' ) );
+		update_option( "acui_cron_change_role_not_present", $change_role_not_present );
 
         if( isset( $form_data["cron-change-role-not-present-role"] ) ){
             $submitted_not_present_role = sanitize_text_field( $form_data["cron-change-role-not-present-role"] );
@@ -108,10 +129,23 @@ class ACUI_Cron{
 	    <?php
 	}
 
+	function get_restricted_configurer(){
+		$configured_by = absint( get_option( "acui_cron_configured_by" ) );
+
+		if( $configured_by && !user_can( $configured_by, 'edit_users' ) )
+			return $configured_by;
+
+		return 0;
+	}
+
 	function set_cron_user(){
 		$cron_user_id = absint( get_option( "acui_cron_user_id" ) );
+		$configured_by = $this->get_restricted_configurer();
 
-		if( !$cron_user_id || !user_can( $cron_user_id, apply_filters( 'acui_capability', 'create_users' ) ) ){
+		if( $configured_by ){
+			$cron_user_id = user_can( $configured_by, apply_filters( 'acui_capability', 'create_users' ) ) ? $configured_by : 0;
+		}
+		elseif( !$cron_user_id || !user_can( $cron_user_id, apply_filters( 'acui_capability', 'create_users' ) ) ){
 			$admins = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) );
 			$cron_user_id = !empty( $admins ) ? $admins[0] : 0;
 		}
@@ -120,18 +154,23 @@ class ACUI_Cron{
 			wp_set_current_user( $cron_user_id );
 	}
 
-	function process(){
+	function process( $caller_can_promote_users = null ){
 		$session_id = sanitize_key( uniqid( 'c' ) );
 		$message = __('Import cron task - Step #1 - starts at', 'import-users-from-csv-with-meta' ) . ' ' . current_time('mysql') . '<br/>';
 
+		$has_real_session = is_user_logged_in();
+
 		$this->set_cron_user();
 
+		if( $caller_can_promote_users === null && !$has_real_session )
+			$caller_can_promote_users = (bool) get_option( "acui_cron_role_authorized" );
 
 		$form_data = array();
 		$form_data[ "acui_session_id" ] = $session_id;
 		$form_data[ "path_to_file" ] = $this->clean_path_url_csv( get_option( "acui_cron_path_to_file") );
 		$form_data[ "role" ] = get_option( "acui_cron_role" );
-		$form_data[ "update_roles_existing_users" ] = ( get_option( "acui_cron_update_roles_existing_users" ) ) ? 'yes' : 'no';
+		$form_data[ "caller_can_promote_users" ] = $caller_can_promote_users;
+		$form_data[ "update_roles_existing_users" ] = self::get_update_roles_existing_users();
 		$form_data[ "update_emails_existing_users" ] = "no";
 		$form_data[ "empty_cell_action" ] = "leave";
 		$form_data[ "security" ] = wp_create_nonce( "codection-security" );
@@ -158,16 +197,22 @@ class ACUI_Cron{
 		}
 	}
 
-	function process_step( $step, $initial_row, $session_id = '' ){
+	function process_step( $step, $initial_row, $session_id = '', $caller_can_promote_users = null ){
 		$message = __('Import cron task - Step #' . $step . ' - starts at', 'import-users-from-csv-with-meta' ) . ' ' . current_time('mysql') . '<br/>';
 
+		$has_real_session = is_user_logged_in();
+
 		$this->set_cron_user();
+
+		if( $caller_can_promote_users === null && !$has_real_session )
+			$caller_can_promote_users = (bool) get_option( "acui_cron_role_authorized" );
 
 		$form_data = array();
 		$form_data[ "acui_session_id" ] = $session_id;
 		$form_data[ "path_to_file" ] = $this->clean_path_url_csv( get_option( "acui_cron_path_to_file") );
 		$form_data[ "role" ] = get_option( "acui_cron_role");
-		$form_data[ "update_roles_existing_users" ] = ( get_option( "acui_cron_update_roles_existing_users" ) ) ? 'yes' : 'no';
+		$form_data[ "caller_can_promote_users" ] = $caller_can_promote_users;
+		$form_data[ "update_roles_existing_users" ] = self::get_update_roles_existing_users();
 		$form_data[ "update_emails_existing_users" ] = "no";
 		$form_data[ "empty_cell_action" ] = "leave";
 		$form_data[ "security" ] = wp_create_nonce( "codection-security" );
@@ -302,7 +347,7 @@ class ACUI_Cron{
 		$path_to_file = get_option( "acui_cron_path_to_file");
 		$period = get_option( "acui_cron_period");
 		$role = get_option( "acui_cron_role");
-		$update_roles_existing_users = get_option( "acui_cron_update_roles_existing_users");
+		$update_roles_existing_users = self::get_update_roles_existing_users();
 		$move_file_cron = get_option( "acui_move_file_cron");
 		$path_to_move = get_option( "acui_cron_path_to_move");
 		$path_to_move_auto_rename = get_option( "acui_cron_path_to_move_auto_rename");
@@ -322,9 +367,6 @@ class ACUI_Cron{
 
 		if( empty( $cron_delete_users ) )
 			$cron_delete_users = false;
-
-		if( empty( $update_roles_existing_users) )
-			$update_roles_existing_users = false;
 
 		if( empty( $cron_delete_users_assign_posts ) )
 			$cron_delete_users_assign_posts = '';
@@ -470,6 +512,7 @@ class ACUI_Cron{
 							'capability' => apply_filters( 'acui_capability', 'create_users' ),
 							'fields'     => array( 'ID', 'user_login', 'display_name' ),
 							'orderby'    => 'display_name',
+							'include'    => current_user_can( 'edit_users' ) ? array() : array( get_current_user_id() ),
 						) );
 						$cron_user_id_saved = absint( get_option( 'acui_cron_user_id' ) );
 						?>
@@ -541,7 +584,13 @@ class ACUI_Cron{
 				<tr class="form-field form-required">
 					<th scope="row"><label for="update-roles-existing-users"><?php _e( 'Update roles for existing users?', 'import-users-from-csv-with-meta' ); ?></label></th>
 					<td>
-                        <?php ACUIHTML()->checkbox( array( 'name' => 'update-roles-existing-users', 'compare_value' => $update_roles_existing_users ) ); ?>
+                        <?php ACUIHTML()->select( array(
+                            'options' => array( 'no' => __( 'No', 'import-users-from-csv-with-meta' ), 'yes' => __( 'Yes, update and override existing roles', 'import-users-from-csv-with-meta' ), 'yes_no_override' => __( 'Yes, add new roles and do not override existing ones', 'import-users-from-csv-with-meta' ) ),
+                            'name' => 'update-roles-existing-users',
+                            'show_option_all' => false,
+                            'show_option_none' => false,
+                            'selected' => $update_roles_existing_users,
+                        )); ?>
 					</td>
 				</tr>
 
@@ -958,6 +1007,14 @@ class ACUI_Cron{
 		if( !current_user_can( apply_filters( 'acui_capability', 'create_users' ) ) )
 			wp_die( __( 'Only users who are allowed to create users can run the import task.', 'import-users-from-csv-with-meta' ) );
 
+		$configured_by = $this->get_restricted_configurer();
+		if( $configured_by && $configured_by != get_current_user_id() ){
+			if( !user_can( $configured_by, apply_filters( 'acui_capability', 'create_users' ) ) )
+				wp_die( __( 'The user who configured the import task is no longer allowed to create users.', 'import-users-from-csv-with-meta' ) );
+
+			wp_set_current_user( $configured_by );
+		}
+
 		do_action( 'acui_cron_process' );
 		echo "OK";
 		wp_die();
@@ -969,8 +1026,11 @@ class ACUI_Cron{
 		if( !current_user_can( apply_filters( 'acui_capability', 'create_users' ) ) )
 			wp_die( __( 'Only users who are allowed to create users can run the import task.', 'import-users-from-csv-with-meta' ) );
 
+		$configured_by = $this->get_restricted_configurer();
+		$caller_can_promote_users = $configured_by ? user_can( $configured_by, 'promote_users' ) : current_user_can( 'promote_users' );
+
 		wp_set_current_user( 0 );
-		do_action( 'acui_cron_process' );
+		do_action( 'acui_cron_process', $caller_can_promote_users );
 		echo "OK";
 		wp_die();
 	}

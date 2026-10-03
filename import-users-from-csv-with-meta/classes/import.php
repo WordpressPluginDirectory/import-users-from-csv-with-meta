@@ -5,6 +5,10 @@ class ACUI_Import{
     function __construct(){
     }
 
+    static function current_user_can_export(){
+        return current_user_can( apply_filters( 'acui_export_capability', 'edit_users' ) );
+    }
+
     function hooks(){
         add_action( 'wp_ajax_acui_import_users_batch', array( $this, 'ajax_import_users_batch' ) );
         add_action( 'acui_post_import_single_user', array( $this, 'mark_user_as_imported' ), 10, 11 );
@@ -46,7 +50,12 @@ class ACUI_Import{
         $tab = ( isset ( $_GET['tab'] ) ) ? $_GET['tab'] : 'homepage';
         $sections = $this->get_sections_from_tab( $tab );
 	    $section = isset( $_GET['section'] ) ? sanitize_text_field( $_GET['section'] ) : 'main';
-    
+
+        $export_tab_ids = apply_filters( 'acui_export_tab_ids', array( 'export', 'frontend-export', 'cron-export' ) );
+        if ( in_array( $tab, $export_tab_ids, true ) && ! self::current_user_can_export() ) {
+            wp_die( __( 'You are not allowed to see this content.', 'import-users-from-csv-with-meta' ) );
+        }
+
         if( isset( $_POST ) && !empty( $_POST ) ):
             if ( !wp_verify_nonce( $_POST['security'], 'codection-security' ) ) {
                 wp_die( __( 'Nonce check failed', 'import-users-from-csv-with-meta' ) ); 
@@ -177,8 +186,9 @@ class ACUI_Import{
 
         $all_tabs = apply_filters( 'acui_tabs', $all_tabs );
 
+        $can_export  = self::current_user_can_export();
         $in_import   = in_array( $current, $import_tab_ids );
-        $in_export   = in_array( $current, $export_tab_ids );
+        $in_export   = in_array( $current, $export_tab_ids ) && $can_export;
         $in_settings = in_array( $current, $settings_tab_ids );
         $in_log      = in_array( $current, $log_tab_ids );
 
@@ -190,8 +200,10 @@ class ACUI_Import{
         $import_class = $in_import ? ' nav-tab-active' : '';
         echo "<a class='nav-tab$import_class' href='?page=acui&tab=homepage'>" . __( 'Import', 'import-users-from-csv-with-meta' ) . "</a>";
 
-        $export_class = $in_export ? ' nav-tab-active' : '';
-        echo "<a class='nav-tab$export_class' href='?page=acui&tab=export'>" . __( 'Export', 'import-users-from-csv-with-meta' ) . "</a>";
+        if( $can_export ){
+            $export_class = $in_export ? ' nav-tab-active' : '';
+            echo "<a class='nav-tab$export_class' href='?page=acui&tab=export'>" . __( 'Export', 'import-users-from-csv-with-meta' ) . "</a>";
+        }
 
         $settings_class = $in_settings ? ' nav-tab-active' : '';
         echo "<a class='nav-tab$settings_class' href='?page=acui&tab=mail-options'>" . __( 'Settings', 'import-users-from-csv-with-meta' ) . "</a>";
@@ -861,7 +873,9 @@ class ACUI_Import{
             
             if( empty( array_intersect( apply_filters( 'acui_protected_roles', array( 'administrator' ) ), ACUIHelper()->get_roles_by_user_id( $user_id ) ) ) || is_multisite() && is_super_admin( $user_id ) ){
                 
-                if( $settings['update_roles_existing_users'] == 'yes' || $created ){
+                $can_promote_users = ( $settings['caller_can_promote_users'] !== null ) ? (bool) $settings['caller_can_promote_users'] : current_user_can( 'promote_users' );
+
+                if( ( $settings['update_roles_existing_users'] == 'yes' && $can_promote_users ) || $created ){
                     $default_roles = $user_object->roles;
                     foreach ( $default_roles as $default_role ) {
                         $user_object->remove_role( $default_role );
@@ -869,7 +883,7 @@ class ACUI_Import{
                 }
 
                 if( !$no_role && ( $settings['update_roles_existing_users'] == 'yes' || $settings['update_roles_existing_users'] == 'yes_no_override' || $created ) ){
-                    if( !empty( $role ) && !current_user_can( 'promote_users' ) ){
+                    if( !empty( $role ) && !$can_promote_users ){
                         $errors[] = ACUIHelper()->new_error( $row, __( 'You are not allowed to assign roles, the requested role was ignored.', 'import-users-from-csv-with-meta' ), 'warning' );
                         $role = array();
                     }
@@ -878,6 +892,14 @@ class ACUI_Import{
                         $editable_roles = array_change_key_case( ACUIHelper()->get_editable_roles(), CASE_LOWER );
                         $role = array_filter( (array) $role, function( $single_role ) use ( $editable_roles ) {
                             return array_key_exists( strtolower( trim( $single_role ) ), $editable_roles );
+                        } );
+                    }
+
+                    $can_create_users = ( $settings['caller_can_promote_users'] !== null ) ? $can_promote_users : current_user_can( 'create_users' );
+                    if( !empty( $role ) && in_array( 'administrator', array_map( function( $single_role ){ return strtolower( trim( $single_role ) ); }, (array) $role ), true ) && !$can_create_users ){
+                        $errors[] = ACUIHelper()->new_error( $row, __( 'Assigning the administrator role requires the create_users capability; the administrator role was ignored for this row.', 'import-users-from-csv-with-meta' ), 'warning' );
+                        $role = array_filter( (array) $role, function( $single_role ){
+                            return strtolower( trim( $single_role ) ) !== 'administrator';
                         } );
                     }
 
@@ -925,8 +947,12 @@ class ACUI_Import{
         // Multisite add user to current blog
         if( is_multisite() ){
             if( $created || $settings['update_roles_existing_users'] != 'no' ){
-                if( empty( $role ) )
-                    $role = 'subscriber';
+                if( empty( $role ) ){
+                    if( !$created && $settings['update_roles_existing_users'] == 'yes_no_override' && is_user_member_of_blog( $user_id, get_current_blog_id() ) )
+                        $role = array();
+                    else
+                        $role = 'subscriber';
+                }
 
                 if( !is_array( $role ) ){
                     add_user_to_blog( get_current_blog_id(), $user_id, $role );
@@ -1070,7 +1096,13 @@ class ACUI_Import{
         $settings['change_role_not_present_role'] = isset( $form_data["change_role_not_present_role"] ) ? sanitize_text_field( $form_data["change_role_not_present_role"] ) : '';
         $settings['not_present_same_role'] = isset( $form_data["not_present_same_role"] ) ? sanitize_text_field( $form_data["not_present_same_role"] ) : 'no';
         $settings['not_present_only_imported'] = isset( $form_data["not_present_only_imported"] ) ? sanitize_text_field( $form_data["not_present_only_imported"] ) : 'no';
-        
+        // The pre-recorded promote_users/create_users decision is only trustworthy on the
+        // cron path, where it was derived from a capability at schedule time. On every
+        // request-driven path $form_data is the raw request, so a caller could set this
+        // value themselves; force it to null there so the checks fall back to
+        // current_user_can() for the user actually making the request.
+        $settings['caller_can_promote_users'] = ( $is_cron && array_key_exists( 'caller_can_promote_users', $form_data ) ) ? $form_data['caller_can_promote_users'] : null;
+
         if( $is_cron ){
             $settings['allow_multiple_accounts'] = ( get_option( "acui_cron_allow_multiple_accounts" ) == "allowed" ) ? "allowed" : "not_allowed";
         }
@@ -1228,10 +1260,11 @@ class ACUI_Import{
         }
     }
 
-    function save_transients( $columns, $headers, $headers_filtered, $positions, $errors, $errors_totals, $results, $users_created, $users_updated, $users_ignored, $roles_appeared, $users_deleted = array() ){
+    function save_transients( $columns, $headers, $headers_filtered, $positions, $errors, $errors_totals, $results, $users_created, $users_updated, $users_ignored, $roles_appeared, $users_deleted = array(), $resume_offset = 0 ){
         $pfx = 'acui' . ( $this->session_id ? '_' . $this->session_id : '' ) . '_';
         $ttl = HOUR_IN_SECONDS;
         set_transient( $pfx . 'columns', $columns, $ttl );
+        set_transient( $pfx . 'resume_offset', $resume_offset, $ttl );
         set_transient( $pfx . 'headers', $headers, $ttl );
         set_transient( $pfx . 'headers_filtered', $headers_filtered, $ttl );
         set_transient( $pfx . 'positions', $positions, $ttl );
@@ -1271,10 +1304,11 @@ class ACUI_Import{
 
         if( $step == 1 ){
             $columns = 0;
-            
+            $resume_offset = 0;
+
             $headers = array();
             $headers_filtered = array();
-            $positions = array();            
+            $positions = array();
 
             $errors = array();
             $errors_totals = array( 'notices' => 0, 'warnings' => 0, 'errors' => 0 );
@@ -1291,6 +1325,8 @@ class ACUI_Import{
         else{
             $pfx = 'acui' . ( $this->session_id ? '_' . $this->session_id : '' ) . '_';
             $columns = get_transient( $pfx . 'columns' );
+            $resume_offset = get_transient( $pfx . 'resume_offset' );
+            if( !is_numeric( $resume_offset ) ) $resume_offset = 0;
 
             $headers = get_transient( $pfx . 'headers' );
             if( !is_array( $headers ) ) $headers = array();
@@ -1335,12 +1371,12 @@ class ACUI_Import{
         $file = apply_filters( 'acui_import_file_path', $file, $form_data );
         $delimiter = ACUIHelper()->detect_delimiter( $file );
         $manager = new SplFileObject( $file );
-        if( $initial_row != 0 )
-            $manager->seek( $initial_row );
+        if( $resume_offset > 0 )
+            $manager->fseek( $resume_offset );
 
         if( $initial_row != 0 && !$columns ){
             $header_manager = new SplFileObject( $file );
-            $header_data = $header_manager->fgetcsv( $delimiter );
+            $header_data = $header_manager->fgetcsv( $delimiter, '"', "\0" );
             if( is_array( $header_data ) && count( $header_data ) > 1 ){
                 $headers = array();
                 $headers_filtered = array();
@@ -1351,7 +1387,7 @@ class ACUI_Import{
             unset( $header_manager );
         }
 
-        while( $data = $manager->fgetcsv( $delimiter ) ):
+        while( $data = $manager->fgetcsv( $delimiter, '"', "\0" ) ):
             $row++;
 
             if( count( $data ) == 1 )
@@ -1406,10 +1442,10 @@ class ACUI_Import{
             }
 
             if( $limit > 0 && ($row - $initial_row) >= $limit + ($initial_row == 0 ? 1 : 0) ){
-                $this->save_transients( $columns, $headers, $headers_filtered, $positions, $errors, $errors_totals, $results, $users_created, $users_updated, $users_ignored, $roles_appeared, $users_deleted );
+                $this->save_transients( $columns, $headers, $headers_filtered, $positions, $errors, $errors_totals, $results, $users_created, $users_updated, $users_ignored, $roles_appeared, $users_deleted, $manager->ftell() );
 
                 if( $is_cron ){
-                    as_enqueue_async_action( 'acui_cron_process_step', array( 'step' => $step + 1, 'initial_row' => $row, 'session_id' => $this->session_id ) );
+                    as_enqueue_async_action( 'acui_cron_process_step', array( 'step' => $step + 1, 'initial_row' => $row, 'session_id' => $this->session_id, 'caller_can_promote_users' => isset( $form_data['caller_can_promote_users'] ) ? $form_data['caller_can_promote_users'] : null ) );
                 }
 
                 ACUIHelper()->print_table_end( false );
@@ -1418,10 +1454,10 @@ class ACUI_Import{
             }
 
             if( $this->time_exceeded( $time_start, $time_per_step ) ){
-                $this->save_transients( $columns, $headers, $headers_filtered, $positions, $errors, $errors_totals, $results, $users_created, $users_updated, $users_ignored, $roles_appeared, $users_deleted );
+                $this->save_transients( $columns, $headers, $headers_filtered, $positions, $errors, $errors_totals, $results, $users_created, $users_updated, $users_ignored, $roles_appeared, $users_deleted, $manager->ftell() );
 
                 if( $is_cron ){
-                    as_enqueue_async_action( 'acui_cron_process_step', array( 'step' => $step + 1, 'initial_row' => $row, 'session_id' => $this->session_id ) );
+                    as_enqueue_async_action( 'acui_cron_process_step', array( 'step' => $step + 1, 'initial_row' => $row, 'session_id' => $this->session_id, 'caller_can_promote_users' => isset( $form_data['caller_can_promote_users'] ) ? $form_data['caller_can_promote_users'] : null ) );
                 }
                 ACUIHelper()->print_table_end( false );
                 echo '</div>';
@@ -1446,7 +1482,7 @@ class ACUI_Import{
             $delete_users_assign_posts = false;
             $change_role_not_present_flag = false;
 
-            if( $settings['delete_users_not_present'] == 'yes' ){
+            if( $settings['delete_users_not_present'] == 'yes' && current_user_can( 'delete_users' ) ){
                 $delete_users_flag = true;
                 $delete_users_assign_posts = $settings['delete_users_assign_posts'];
             }
@@ -1456,7 +1492,7 @@ class ACUI_Import{
                 $delete_users_assign_posts = get_option( "acui_cron_delete_users_assign_posts");
             }
 
-            if( $is_backend && $settings['change_role_not_present'] == 'yes' ){
+            if( $is_backend && $settings['change_role_not_present'] == 'yes' && current_user_can( 'promote_users' ) ){
                 $change_role_not_present_flag = true;
                 $change_role_not_present_role = $settings['change_role_not_present_role'];
             }
@@ -1466,7 +1502,7 @@ class ACUI_Import{
                 $change_role_not_present_role = get_option( "acui_cron_change_role_not_present_role");
             }
 
-            if( $is_frontend && !empty( get_option( "acui_frontend_change_role_not_present" ) ) ){
+            if( $is_frontend && !empty( get_option( "acui_frontend_change_role_not_present" ) ) && current_user_can( 'promote_users' ) ){
                 $change_role_not_present_flag = true;
                 $change_role_not_present_role = get_option( "acui_frontend_change_role_not_present_role");
             }
